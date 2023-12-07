@@ -1,0 +1,29 @@
+{
+  "layers": [
+    {
+      "name": "layer1",
+      "data": [10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0, 0, 0, 10, 0],
+      "height": 10,
+      "opacity": 1.0,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 5,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "orientation": "orthogonal",
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "image": "basicset.png",
+      "imageheight": 16,
+      "imagewidth": 176,
+      "margin": 0,
+      "name": "backgroundtileset",
+      "spacing": 0,
+      "tileheight": 16,
+      "tilewidth": 16
+    }
+  ]
+}
