@@ -3,7 +3,7 @@
 import { LoadScene } from "./scenes/LoadScene.ts";
 import { PlayScene } from "./scenes/PlayScene.ts";
 
-let game = new Phaser.Game({
+new Phaser.Game({
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -21,13 +21,13 @@ let game = new Phaser.Game({
         default: "arcade",
         arcade: {
              fixedStep: false,
-            debug: true,
+            /*debug: true,
             debugShowBody: true,
             debugShowStaticBody: true,
             debugShowVelocity: true,
             debugVelocityColor: 0xffff00,
             debugBodyColor: 0x0000ff,
-            debugStaticBodyColor: 0xffffff 
+            debugStaticBodyColor: 0xffffff */
         }
     },
     dom: {

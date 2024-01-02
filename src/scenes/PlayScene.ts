@@ -16,24 +16,33 @@ export class PlayScene extends Phaser.Scene {
 
     preload() {
         //this.load.tilemapTiledJSON('map', "http://localhost:8080/level?levelId=8" );
-        this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json');
-        this.load.image('tiles', 'assets/image/basicset.png');
 
-        this.load.image('block', 'assets/image/block.png');
+        this.load.image('base_tiles', 'assets/tileset.png')
+
+        this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
     }
 
     create() {
-        this.map = this.make.tilemap({key: 'tilemap'});
-        const tileset = this.map.addTilesetImage('backgroundtileset', 'tiles', 16, 16);
 
-        this.map.createLayer('layer1', tileset);
+        //this.cameras.main.centerOn(0, 0);
+
+
+        this.map = this.make.tilemap({key: 'tilemap'})
+
+        const tileset = this.map.addTilesetImage('backgroundtileset', 'base_tiles')
+
+        this.map.createLayer('umap_iris', tileset)
+
 
         // @ts-ignore
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        this.player = this.physics.add.image(0, 0, 'block');
+        this.player = this.physics.add.image(0, 0, 'block')
 
-        this.player.setCollideWorldBounds(true);
+        //this.player.setCollideWorldBounds(true)
+
+        this.cameras.main.startFollow(this.player);
+        this.cameras.main.setZoom(0.5,0.5);
     }
 
     update(time: number, delta: number) { //delta ~16.66 @ 60fps
