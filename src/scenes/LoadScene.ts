@@ -1,4 +1,5 @@
-import { CONSTANTS } from "../constants.ts";
+import { SCENES } from "../constants/scenes.ts";
+import {REGISTRY} from "../constants/registry.ts";
 
 
 export class LoadScene extends Phaser.Scene{
@@ -6,7 +7,7 @@ export class LoadScene extends Phaser.Scene{
 
     constructor() {
         super({
-            key: CONSTANTS.SCENES.LOAD
+            key: SCENES.LOAD
         })
     }
 
@@ -14,9 +15,9 @@ export class LoadScene extends Phaser.Scene{
         /*
         this.load.setPath("./assets/image");
 
-        for(let prop in CONSTANTS.IMAGE) {
+        for(let prop in Scenes.IMAGE) {
             //@ts-ignore
-            this.load.image(CONSTANTS.IMAGE[prop], CONSTANTS.IMAGE[prop]);
+            this.load.image(Scenes.IMAGE[prop], Scenes.IMAGE[prop]);
         }
         */
     }
@@ -24,14 +25,14 @@ export class LoadScene extends Phaser.Scene{
     loadSprites(frameConfig?: Phaser.Types.Loader.FileTypes.ImageFrameConfig) {
        /* this.load.setPath("./assets/sprite");
 
-        for(let prop in CONSTANTS.SPRITE) {
+        for(let prop in Scenes.SPRITE) {
             //@ts-ignore
-            this.load.spritesheet(CONSTANTS.SPRITE[prop], CONSTANTS.SPRITE[prop], frameConfig);
+            this.load.spritesheet(Scenes.SPRITE[prop], Scenes.SPRITE[prop], frameConfig);
         } */
     }
 
     preload() {
-        //this.load.json('overviewData', CONSTANTS.URLS.OVERVIEW);
+        //this.load.json('overviewData', Scenes.URLS.OVERVIEW);
 
         //load images, spritesheet, sounds
         this.loadImages();
@@ -58,18 +59,18 @@ export class LoadScene extends Phaser.Scene{
 
         this.initRegistry();
         this.createAnims();
-        this.scene.start(CONSTANTS.SCENES.PLAY);
+        this.scene.start(SCENES.PLAY);
     }
 
     private createAnims(){
-     /*   for(let prop in CONSTANTS.SPRITE) {
-            this.createAnimations(prop, CONSTANTS.SPRITE[prop]);
+     /*   for(let prop in Scenes.SPRITE) {
+            this.createAnimations(prop, Scenes.SPRITE[prop]);
         } */
     }
 
     private createAnimations(name: string, refString: string) {
      /*   this.anims.create({
-            key: CONSTANTS.SPRITE_ANIM[name],
+            key: Scenes.SPRITE_ANIM[name],
             frames: this.anims.generateFrameNumbers(refString, { start: 0, end: 49 }),
             frameRate: 20,
             repeat: -1,
@@ -77,6 +78,6 @@ export class LoadScene extends Phaser.Scene{
     }
 
     private initRegistry() {
-        this.registry.set("test", 0);
+        this.registry.set(REGISTRY.CLUSTER, null);
     }
 }

@@ -1,0 +1,5 @@
+export const EVENTS = {
+    GAMEOVER: "GAMEOVER",
+    GAMESTART: "GAMESTART",
+    ADDPOINTS: "ADDPOINTS",
+}
