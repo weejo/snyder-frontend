@@ -1,19 +1,19 @@
 import {SCENES} from "../constants/scenes.ts";
 import {REGISTRY} from "../constants/registry.ts";
 import {constUtils} from "../utils/constUtils.ts";
-import Set = Phaser.Structs.Set;
 import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
+import {CONFIG} from "../constants/config.ts";
+import Set = Phaser.Structs.Set;
 
 export class TrackingScene extends Phaser.Scene {
-
-    timer: any;
     player: any;
     lastTile?: Phaser.Tilemaps.Tile;
     path: Set<Phaser.Tilemaps.Tile>;
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
     coords: any;
+    bIsGameRunning: boolean;
 
     constructor() {
         super({
@@ -22,6 +22,7 @@ export class TrackingScene extends Phaser.Scene {
         this.path = new Set();
         this.lastTile = undefined;
         this.coords = this.resetCoords();
+        this.bIsGameRunning = false;
     }
 
     init(data: any) {
@@ -29,26 +30,29 @@ export class TrackingScene extends Phaser.Scene {
         this.map = data.map;
     }
 
+    create() {
+        this.setupEventListeners();
+    }
+
 
     update(time: number, delta: number) {
-        this.timer += delta;
-
-        if (this.timer > 200) {
-            this.timer = 0;
-
+        if(this.bIsGameRunning) {
             var tileAtWorldXY = this.map.getTileAtWorldXY(this.player.x, this.player.y);
 
             if (tileAtWorldXY == null) {
                 eventUtils.emit(EVENTS.GAMEOVER);
             } else if (this.lastTile != tileAtWorldXY) {
+                console.log(this.path);
                 if (this.path.contains(tileAtWorldXY)) {
-
+                    console.log("finished path");
                     this.cleanUpPath(tileAtWorldXY);
-                    this.computePointsForCluster();
+                    this.computePointsForGeneratedCluster();
                     this.coords = this.resetCoords();
                     this.path = new Set();
 
                 } else {
+                    console.log("adding to path");
+                    this.lastTile = tileAtWorldXY;
                     this.path.set(tileAtWorldXY);
                     this.updateCoords(tileAtWorldXY);
                 }
@@ -72,13 +76,14 @@ export class TrackingScene extends Phaser.Scene {
         }
     }
 
-    private computePointsForCluster() {
+    private computePointsForGeneratedCluster() {
         let points = 0;
         let counter = 0;
         let tiles = [];
         for (let x = this.coords.lowestX; x < this.coords.highestX + 1; x++) {
             for (let y = this.coords.lowestY; y < this.coords.highestY + 1; y++) {
                 let currentTile = this.map?.getTileAtWorldXY(x, y);
+                // TODO: This doesn't find anything inside the polygon... figure out why.
                 if (currentTile != null && this.isPointInsidePolygon(currentTile)) {
                     tiles.push(constUtils.resolvePoint(currentTile.x, currentTile.y, this.map.width));
                     points += currentTile.index;
@@ -92,6 +97,10 @@ export class TrackingScene extends Phaser.Scene {
             cluster[tile] = average;
         }
         this.registry.set(REGISTRY.CLUSTER, cluster);
+        var score = this.registry.get(REGISTRY.SCORE);
+        score += average * CONFIG.SCORESCALE;
+        this.registry.set(REGISTRY.SCORE);
+        eventUtils.emit(EVENTS.SCORECHANGE, score);
     }
 
     /**
@@ -136,6 +145,13 @@ export class TrackingScene extends Phaser.Scene {
         if (tile.y < this.coords.lowestY) {
             this.coords.lowestY = tile.y;
         }
+    }
 
+    private setupEventListeners() {
+        eventUtils.on(EVENTS.GAMESTART, this.changeGameState, this);
+    }
+
+    private changeGameState(bIsRunning: boolean) {
+        this.bIsGameRunning = bIsRunning;
     }
 }

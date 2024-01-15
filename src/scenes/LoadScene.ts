@@ -79,5 +79,6 @@ export class LoadScene extends Phaser.Scene{
 
     private initRegistry() {
         this.registry.set(REGISTRY.CLUSTER, null);
+        this.registry.set(REGISTRY.SCORE, 0);
     }
 }

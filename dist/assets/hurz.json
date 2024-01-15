@@ -1,4 +1,6 @@
 {
+  "height": 328,
+  "width": 266,
   "layers": [
     {
       "name": "umap_iris",
@@ -87262,8 +87264,8 @@
     }
   ],
   "orientation": "orthogonal",
-  "tilewidth": 8,
-  "tileheight": 8,
+  "tilewidth": 16,
+  "tileheight": 16,
   "tilesets": [
     {
       "firstgid": 0,

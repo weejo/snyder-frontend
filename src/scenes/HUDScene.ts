@@ -5,7 +5,9 @@ import {EVENTS} from "../constants/events.ts";
 
 
 export class HUDScene extends Phaser.Scene {
+    // @ts-ignore
     scoreDisplay: Phaser.GameObjects.Text;
+    // @ts-ignore
     timeDisplay: Phaser.GameObjects.Text;
     bIsGameRunning: boolean;
     timer: number;
@@ -23,26 +25,28 @@ export class HUDScene extends Phaser.Scene {
     }
 
     private setupDisplays() {
-        this.scoreDisplay = this.add.text(width / 2, height / 10, "0")
-            .setScale(1.5)
-            .setColor('#ffffff');
+        let { width, height } = this.sys.game.canvas;
 
-        this.timeDisplay = this.add.text(width / 2, height - 100, this.timer)
-            .setScale(1.5)
-            .setColor('#ffffff');
+        this.scoreDisplay = this.add.text(width / 2, height / 10, "0")
+            .setScale(2)
+            .setColor('#FF0000');
+
+        this.timeDisplay = this.add.text(width / 2, height - 100, (this.timer/1000).toString())
+            .setScale(2)
+            .setColor('#FF0000');
     }
 
     private setupEventListeners() {
         eventUtils.on(EVENTS.GAMESTART, this.changeGameState, this);
 
-        eventUtils.on(EVENTS.ADDPOINTS, this.changePointDisplay, this);
+        eventUtils.on(EVENTS.SCORECHANGE, this.changeScoreDisplay, this);
     }
 
     update(time: number, delta: number) {
         if(this.bIsGameRunning) {
             if (this.timer > 0) {
                 this.timer -= delta;
-                this.timeDisplay.setText(this.timer.toFixed(1),toString()).setColor('#ffffff')
+                this.timeDisplay.setText( (this.timer/1000).toFixed(1).toString()).setColor('#FF0000')
             } else {
                 eventUtils.emit(EVENTS.GAMEOVER);
             }
@@ -53,7 +57,7 @@ export class HUDScene extends Phaser.Scene {
         this.bIsGameRunning = bIsRunning;
     }
 
-    private changePointDisplay(points: number) {
-        this.scoreDisplay.setText(points.toString()).setColor('#FFFFFF')
+    private changeScoreDisplay(points: number) {
+        this.scoreDisplay.setText(points.toString()).setColor('#FF0000')
     }
 }

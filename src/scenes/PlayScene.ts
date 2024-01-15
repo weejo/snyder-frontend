@@ -8,12 +8,14 @@ export class PlayScene extends Phaser.Scene {
     player: any;
     cursors: any;
     map: any;
+    tileset: any;
+    gameStarted: boolean;
 
     constructor() {
         super({
             key: SCENES.PLAY, active: true
         });
-
+        this.gameStarted = false;
     }
 
     preload() {
@@ -26,7 +28,6 @@ export class PlayScene extends Phaser.Scene {
 
     create() {
 
-        //this.cameras.main.centerOn(0, 0);
         this.prepareMap();
 
         this.setupPlayer();
@@ -35,7 +36,7 @@ export class PlayScene extends Phaser.Scene {
 
         this.setupEventListeners();
 
-        eventUtils.emit(EVENTS.GAMESTART, true);
+
     }
 
     private setupScenes() {
@@ -46,10 +47,13 @@ export class PlayScene extends Phaser.Scene {
     private setupPlayer() {
         // @ts-ignore
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.player = this.physics.add.image(100, 100, 'block');
+        this.player.setPosition(100,100);
 
-        this.player = this.physics.add.image(0, 0, 'block')
 
-        this.player.setCollideWorldBounds(true)
+        this.physics.world.setBounds(0,0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
+
+        this.player.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setZoom(0.5, 0.5);
@@ -58,9 +62,9 @@ export class PlayScene extends Phaser.Scene {
     private prepareMap() {
         this.map = this.make.tilemap({key: 'tilemap'})
 
-        const tileset = this.map.addTilesetImage('backgroundtileset', 'base_tiles')
+        this.tileset = this.map.addTilesetImage('backgroundtileset', 'base_tiles')
 
-        this.map.createLayer('umap_iris', tileset)
+        this.map.createLayer('umap_iris', this.tileset)
     }
 
     private setupEventListeners() {
@@ -68,6 +72,11 @@ export class PlayScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number) { //delta ~16.66 @ 60fps
+        if (!this.gameStarted) {
+            this.gameStarted = true;
+            eventUtils.emit(EVENTS.GAMESTART, true);
+        }
+
         this.player.setVelocity(0);
 
         if (this.cursors.left.isDown) {
@@ -81,11 +90,9 @@ export class PlayScene extends Phaser.Scene {
         } else if (this.cursors.down.isDown) {
             this.player.setVelocityY(300);
         }
-
-        console.log(this.map.getTileAtWorldXY(this.player.x, this.player.y));
     }
 
     private gameOver() {
-
+        console.log("FINISHED");
     }
 }

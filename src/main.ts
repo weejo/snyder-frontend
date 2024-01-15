@@ -2,6 +2,8 @@
 
 import { LoadScene } from "./scenes/LoadScene.ts";
 import { PlayScene } from "./scenes/PlayScene.ts";
+import {HUDScene} from "./scenes/HUDScene.ts";
+import {TrackingScene} from "./scenes/TrackingScene.ts";
 
 new Phaser.Game({
     scale: {
@@ -11,7 +13,7 @@ new Phaser.Game({
         width: 1920
     },
     scene: [
-        LoadScene, PlayScene
+        LoadScene, PlayScene, HUDScene, TrackingScene
     ],
     render: {
         // so it doesn't default sharpen images. I hope.
@@ -21,13 +23,13 @@ new Phaser.Game({
         default: "arcade",
         arcade: {
              fixedStep: false,
-            /*debug: true,
+            debug: true,
             debugShowBody: true,
             debugShowStaticBody: true,
             debugShowVelocity: true,
             debugVelocityColor: 0xffff00,
             debugBodyColor: 0x0000ff,
-            debugStaticBodyColor: 0xffffff */
+            debugStaticBodyColor: 0xffffff
         }
     },
     dom: {
