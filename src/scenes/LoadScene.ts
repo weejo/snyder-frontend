@@ -57,7 +57,6 @@ export class LoadScene extends Phaser.Scene{
     create() {
        // this.overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
 
-        this.initRegistry();
         this.createAnims();
         this.scene.start(SCENES.PLAY);
     }
@@ -75,10 +74,5 @@ export class LoadScene extends Phaser.Scene{
             frameRate: 20,
             repeat: -1,
         }); */
-    }
-
-    private initRegistry() {
-        this.registry.set(REGISTRY.CLUSTER, null);
-        this.registry.set(REGISTRY.SCORE, 0);
     }
 }

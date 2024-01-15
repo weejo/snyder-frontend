@@ -82,11 +82,10 @@ export class TrackingScene extends Phaser.Scene {
         let tiles = [];
         for (let x = this.coords.lowestX; x < this.coords.highestX + 1; x++) {
             for (let y = this.coords.lowestY; y < this.coords.highestY + 1; y++) {
-                let currentTile = this.map?.getTileAtWorldXY(x, y);
-                // TODO: This doesn't find anything inside the polygon... figure out why.
-                if (currentTile != null && this.isPointInsidePolygon(currentTile)) {
-                    tiles.push(constUtils.resolvePoint(currentTile.x, currentTile.y, this.map.width));
-                    points += currentTile.index;
+                if (this.isPointInsidePolygon(x, y)) {
+                    tiles.push(constUtils.resolvePoint(x, y, this.map.width));
+                    // @ts-ignore
+                    points += this.map.getTileAtWorldXY(x, y)?.index;
                     counter++;
                 }
             }
@@ -106,10 +105,8 @@ export class TrackingScene extends Phaser.Scene {
     /**
      * This is how we check if a point is inisde our path
      */
-    private isPointInsidePolygon(tile: Phaser.Tilemaps.Tile): boolean {
+    private isPointInsidePolygon(x: number, y: number): boolean {
         var polygon = this.path.getArray();
-        const x = tile.x;
-        const y = tile.y;
 
         var inside = false;
         for (let i = 0, j = this.path.size - 1; i < this.path.size; j = i++) {

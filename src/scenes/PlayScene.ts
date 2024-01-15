@@ -1,6 +1,7 @@
 import {SCENES} from "../constants/scenes.ts";
 import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
+import {REGISTRY} from "../constants/registry.ts";
 
 
 export class PlayScene extends Phaser.Scene {
@@ -30,6 +31,8 @@ export class PlayScene extends Phaser.Scene {
 
         this.prepareMap();
 
+        this.initializeRegistry();
+
         this.setupPlayer();
 
         this.setupScenes();
@@ -37,6 +40,13 @@ export class PlayScene extends Phaser.Scene {
         this.setupEventListeners();
 
 
+
+    }
+
+    private initializeRegistry() {
+
+        this.registry.set(REGISTRY.CLUSTER, new Array(this.map.width * this.map.height).fill(0));
+        this.registry.set(REGISTRY.SCORE, 0);
     }
 
     private setupScenes() {
