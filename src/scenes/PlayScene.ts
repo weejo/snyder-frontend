@@ -3,7 +3,6 @@ import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {REGISTRY} from "../constants/registry.ts";
 
-
 export class PlayScene extends Phaser.Scene {
 
     player: any;
@@ -38,9 +37,9 @@ export class PlayScene extends Phaser.Scene {
         this.setupScenes();
 
         this.setupEventListeners();
+        var help = this.add.text(0, 0, '', { font: '48px monospace' });
 
-
-
+        this.setupDebugInput(help);
     }
 
     private initializeRegistry() {
@@ -105,4 +104,20 @@ export class PlayScene extends Phaser.Scene {
     private gameOver() {
         console.log("FINISHED");
     }
+
+    private setupDebugInput(help: Phaser.GameObjects.Text) {
+        var layer = this.map;
+
+
+        this.input.on('pointermove', function onPointerMove(pointer: any) {
+            var tile =  layer.getTileAtWorldXY(pointer.worldX, pointer.worldY, true);
+
+            if (!tile) return;
+
+            help.setText(tile.index).setPosition(tile.pixelX, tile.pixelY);
+        });
+    }
+
+
+
 }

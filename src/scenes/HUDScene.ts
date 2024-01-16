@@ -58,6 +58,6 @@ export class HUDScene extends Phaser.Scene {
     }
 
     private changeScoreDisplay(points: number) {
-        this.scoreDisplay.setText(points.toString()).setColor('#FF0000')
+        this.scoreDisplay.setText(points.toFixed(0).toString()).setColor('#FF0000')
     }
 }

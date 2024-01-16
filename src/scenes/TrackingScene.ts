@@ -14,6 +14,7 @@ export class TrackingScene extends Phaser.Scene {
     map: Phaser.Tilemaps.Tilemap;
     coords: any;
     bIsGameRunning: boolean;
+    currentPolygon: Phaser.Tilemaps.Tile[];
 
     constructor() {
         super({
@@ -23,6 +24,7 @@ export class TrackingScene extends Phaser.Scene {
         this.lastTile = undefined;
         this.coords = this.resetCoords();
         this.bIsGameRunning = false;
+        this.currentPolygon = [];
     }
 
     init(data: any) {
@@ -36,25 +38,25 @@ export class TrackingScene extends Phaser.Scene {
 
 
     update(time: number, delta: number) {
-        if(this.bIsGameRunning) {
-            var tileAtWorldXY = this.map.getTileAtWorldXY(this.player.x, this.player.y);
+        if (this.bIsGameRunning) {
+            var tile = this.map.getTileAtWorldXY(this.player.x, this.player.y);
 
-            if (tileAtWorldXY == null) {
+            if (tile == null) {
                 eventUtils.emit(EVENTS.GAMEOVER);
-            } else if (this.lastTile != tileAtWorldXY) {
+            } else if (this.lastTile != tile) {
                 console.log(this.path);
-                if (this.path.contains(tileAtWorldXY)) {
+                if (this.path.contains(tile)) {
                     console.log("finished path");
-                    this.cleanUpPath(tileAtWorldXY);
+                    this.currentPolygon = this.extractPolygon(tile);
                     this.computePointsForGeneratedCluster();
                     this.coords = this.resetCoords();
                     this.path = new Set();
 
                 } else {
                     console.log("adding to path");
-                    this.lastTile = tileAtWorldXY;
-                    this.path.set(tileAtWorldXY);
-                    this.updateCoords(tileAtWorldXY);
+                    this.lastTile = tile;
+                    this.path.set(tile);
+                    this.updateCoords(tile);
                 }
             }
         }
@@ -66,14 +68,18 @@ export class TrackingScene extends Phaser.Scene {
      * @param matchingTile the tile that matched.
      * @private
      */
-    private cleanUpPath(matchingTile: Phaser.Tilemaps.Tile) {
+    private extractPolygon(matchingTile: Phaser.Tilemaps.Tile) {
+        let bMeetingPoint = false;
+        let polygon: Phaser.Tilemaps.Tile[] = [];
         for (let tile of this.path.getArray()) {
-            if (tile != matchingTile) {
-                this.path.delete(tile);
-            } else {
-                break;
+            if (tile == matchingTile) {
+                bMeetingPoint = true;
+            }
+            if (bMeetingPoint) {
+                polygon.push(tile);
             }
         }
+        return polygon;
     }
 
     private computePointsForGeneratedCluster() {
@@ -84,8 +90,9 @@ export class TrackingScene extends Phaser.Scene {
             for (let y = this.coords.lowestY; y < this.coords.highestY + 1; y++) {
                 if (this.isPointInsidePolygon(x, y)) {
                     tiles.push(constUtils.resolvePoint(x, y, this.map.width));
+                    console.log(this.map.getTileAt(x, y)?.index)
                     // @ts-ignore
-                    points += this.map.getTileAtWorldXY(x, y)?.index;
+                    points += this.map.getTileAt(x, y)?.index;
                     counter++;
                 }
             }
@@ -96,9 +103,15 @@ export class TrackingScene extends Phaser.Scene {
             cluster[tile] = average;
         }
         this.registry.set(REGISTRY.CLUSTER, cluster);
+
+        this.updateScore(average);
+    }
+
+    private updateScore(average: number) {
         var score = this.registry.get(REGISTRY.SCORE);
         score += average * CONFIG.SCORESCALE;
-        this.registry.set(REGISTRY.SCORE);
+        score.toFixed(2);
+        this.registry.set(REGISTRY.SCORE, score);
         eventUtils.emit(EVENTS.SCORECHANGE, score);
     }
 
@@ -106,12 +119,11 @@ export class TrackingScene extends Phaser.Scene {
      * This is how we check if a point is inisde our path
      */
     private isPointInsidePolygon(x: number, y: number): boolean {
-        var polygon = this.path.getArray();
-
         var inside = false;
-        for (let i = 0, j = this.path.size - 1; i < this.path.size; j = i++) {
-            const xi = polygon[i].x, yi = polygon[i].y;
-            const xj = polygon[j].x, yj = polygon[j].y;
+
+        for (let i = 0, j = this.currentPolygon.length - 1; i < this.currentPolygon.length; j = i++) {
+            const xi = this.currentPolygon[i].x, yi = this.currentPolygon[i].y;
+            const xj = this.currentPolygon[j].x, yj = this.currentPolygon[j].y;
 
             const intersect = yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
             if (intersect) inside = !inside;
