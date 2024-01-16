@@ -102,7 +102,10 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private gameOver() {
-        console.log("FINISHED");
+        this.scene.stop(SCENES.TRACKING);
+        this.scene.stop(SCENES.HUD);
+        this.scene.stop(SCENES.PLAY);
+        this.scene.start(SCENES.GAMEOVER);
     }
 
     private setupDebugInput(help: Phaser.GameObjects.Text) {
