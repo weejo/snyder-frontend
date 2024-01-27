@@ -111,7 +111,6 @@ export class PlayScene extends Phaser.Scene {
     private setupDebugInput(help: Phaser.GameObjects.Text) {
         var layer = this.map;
 
-
         this.input.on('pointermove', function onPointerMove(pointer: any) {
             var tile =  layer.getTileAtWorldXY(pointer.worldX, pointer.worldY, true);
 
