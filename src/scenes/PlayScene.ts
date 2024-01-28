@@ -2,6 +2,7 @@ import {SCENES} from "../constants/scenes.ts";
 import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {REGISTRY} from "../constants/registry.ts";
+import {IMAGE} from "../constants/image.ts";
 
 export class PlayScene extends Phaser.Scene {
 
@@ -63,12 +64,17 @@ export class PlayScene extends Phaser.Scene {
     private setupPlayer() {
         // @ts-ignore
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.player = this.physics.add.image(100, 100, 'block');
+        this.player = this.physics.add.image(100, 100, IMAGE.SHIP);
         this.player.setPosition(100,100);
+
+        // movement stuff
+        this.player.setDamping(true);
+        this.player.setDrag(0.99);
+        this.player.setMaxVelocity(500);
+
 
 
         this.physics.world.setBounds(0,0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
-
         this.player.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player);
@@ -93,19 +99,25 @@ export class PlayScene extends Phaser.Scene {
             eventUtils.emit(EVENTS.GAMESTART, true);
         }
 
-        this.player.setVelocity(0);
-
-        if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-300);
-        } else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(300);
-        }
-
         if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-300);
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(300);
+            this.physics.velocityFromRotation(this.player.rotation, 500, this.player.body.acceleration);
+        } else {
+            this.player.setAcceleration(0);
         }
+
+        if (this.cursors.left.isDown)
+        {
+            this.player.setAngularVelocity(-200);
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.player.setAngularVelocity(200);
+        }
+        else
+        {
+            this.player.setAngularVelocity(0);
+        }
+
     }
 
     private gameOver() {

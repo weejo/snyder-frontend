@@ -1,5 +1,6 @@
 import { SCENES } from "../constants/scenes.ts";
 import {REGISTRY} from "../constants/registry.ts";
+import {IMAGE} from "../constants/image.ts";
 
 
 export class LoadScene extends Phaser.Scene{
@@ -12,14 +13,13 @@ export class LoadScene extends Phaser.Scene{
     }
 
     loadImages() {
-        /*
         this.load.setPath("./assets/image");
 
-        for(let prop in Scenes.IMAGE) {
+        for(let prop in IMAGE) {
             //@ts-ignore
-            this.load.image(Scenes.IMAGE[prop], Scenes.IMAGE[prop]);
+            this.load.image(IMAGE[prop], IMAGE[prop]);
         }
-        */
+
     }
 
     loadSprites(frameConfig?: Phaser.Types.Loader.FileTypes.ImageFrameConfig) {
@@ -36,11 +36,11 @@ export class LoadScene extends Phaser.Scene{
 
         //load images, spritesheet, sounds
         this.loadImages();
-        
+
         this.loadSprites({
             frameHeight: 100,
             frameWidth: 100});
-            
+
         //create loading bar
         let loadingBar = this.add.graphics({
             fillStyle: {

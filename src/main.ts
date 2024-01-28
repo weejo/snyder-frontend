@@ -25,7 +25,7 @@ new Phaser.Game({
     physics: {
         default: "arcade",
         arcade: {
-             fixedStep: false,
+            fixedStep: false,
             debug: true,
             debugShowBody: true,
             debugShowStaticBody: true,
