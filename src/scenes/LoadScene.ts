@@ -58,7 +58,7 @@ export class LoadScene extends Phaser.Scene{
        // this.overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
 
         this.createAnims();
-        this.scene.start(SCENES.PLAY);
+        this.scene.start(SCENES.MENU);
     }
 
     private createAnims(){

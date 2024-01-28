@@ -3,5 +3,7 @@ export const SCENES = {
     PLAY: "PLAY",
     TRACKING: "TRACKING",
     HUD: "HUD",
-    GAMEOVER: "GAMEOVER"
+    GAMEOVER: "GAMEOVER",
+    MENU: "MENU",
+    MENUBACKGROUND: "MENUBACKGROUND"
 }

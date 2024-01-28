@@ -10,12 +10,15 @@ export class PlayScene extends Phaser.Scene {
     map: any;
     tileset: any;
     gameStarted: boolean;
+    blackDeathToggle: boolean;
+
 
     constructor() {
         super({
-            key: SCENES.PLAY, active: true
+            key: SCENES.PLAY, active: false
         });
         this.gameStarted = false;
+        this.blackDeathToggle = false;
     }
 
     preload() {
@@ -24,6 +27,10 @@ export class PlayScene extends Phaser.Scene {
         this.load.image('base_tiles', 'assets/tileset.png')
 
         this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
+    }
+
+    init(data: any) {
+        this.blackDeathToggle = data.blackDeathToggle;
     }
 
     create() {
@@ -50,7 +57,7 @@ export class PlayScene extends Phaser.Scene {
 
     private setupScenes() {
         this.scene.launch(SCENES.HUD);
-        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map});
+        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map, blackDeathToggle: this.blackDeathToggle});
     }
 
     private setupPlayer() {
@@ -119,7 +126,4 @@ export class PlayScene extends Phaser.Scene {
             help.setText(tile.index).setPosition(tile.pixelX, tile.pixelY);
         });
     }
-
-
-
 }

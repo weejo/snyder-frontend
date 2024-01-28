@@ -15,6 +15,9 @@ export class TrackingScene extends Phaser.Scene {
     coords: any;
     bIsGameRunning: boolean;
     currentPolygon: Phaser.Tilemaps.Tile[];
+    currentPolygonContent: Phaser.Tilemaps.Tile[];
+    blackDeathToggle: boolean;
+    isOnRecentlyCleanedPath: boolean;
 
     constructor() {
         super({
@@ -25,11 +28,15 @@ export class TrackingScene extends Phaser.Scene {
         this.coords = this.resetCoords();
         this.bIsGameRunning = false;
         this.currentPolygon = [];
+        this.currentPolygonContent = [];
+        this.blackDeathToggle = false;
+        this.isOnRecentlyCleanedPath = false;
     }
 
     init(data: any) {
         this.player = data.player;
         this.map = data.map;
+        this.blackDeathToggle = data.blackDeathToggle;
     }
 
     create() {
@@ -44,19 +51,27 @@ export class TrackingScene extends Phaser.Scene {
             if (tile == null) {
                 eventUtils.emit(EVENTS.GAMEOVER);
             } else if (this.lastTile != tile) {
-                console.log(this.path);
-                if (this.path.contains(tile)) {
-                    console.log("finished path");
-                    this.currentPolygon = this.extractPolygon(tile);
-                    this.computePointsForGeneratedCluster();
-                    this.coords = this.resetCoords();
-                    this.path = new Set();
+                if (tile.tint == 0) {
+                    if (!this.isOnRecentlyCleanedPath) {
+                        if (this.blackDeathToggle) {
 
+                            eventUtils.emit(EVENTS.GAMEOVER);
+                        }
+                    }
                 } else {
-                    console.log("adding to path");
-                    this.lastTile = tile;
-                    this.path.set(tile);
-                    this.updateCoords(tile);
+                    console.log(this.path);
+                    if (this.path.contains(tile)) {
+                        this.currentPolygon = this.extractPolygon(tile);
+                        this.computePointsForGeneratedCluster();
+                        this.updateVisitedTiles();
+                        this.cleanUp();
+                        this.isOnRecentlyCleanedPath = true;
+                    } else {
+                        this.lastTile = tile;
+                        this.path.set(tile);
+                        this.updateCoords(tile);
+                        this.isOnRecentlyCleanedPath = false;
+                    }
                 }
             }
         }
@@ -89,11 +104,16 @@ export class TrackingScene extends Phaser.Scene {
         for (let x = this.coords.lowestX; x < this.coords.highestX + 1; x++) {
             for (let y = this.coords.lowestY; y < this.coords.highestY + 1; y++) {
                 if (this.isPointInsidePolygon(x, y)) {
-                    tiles.push(constUtils.resolvePoint(x, y, this.map.width));
-                    console.log(this.map.getTileAt(x, y)?.index)
-                    // @ts-ignore
-                    points += this.map.getTileAt(x, y)?.index;
-                    counter++;
+                    var tileAtPosition = this.map.getTileAt(x, y);
+                    if (tileAtPosition) {
+                        this.currentPolygonContent.push(tileAtPosition);
+                        tiles.push(constUtils.resolvePoint(x, y, this.map.width));
+                        console.log(tileAtPosition.index);
+                        // @ts-ignore
+                        points += tileAtPosition.index;
+                        counter++;
+                    }
+
                 }
             }
         }
@@ -162,5 +182,20 @@ export class TrackingScene extends Phaser.Scene {
 
     private changeGameState(bIsRunning: boolean) {
         this.bIsGameRunning = bIsRunning;
+    }
+
+    private updateVisitedTiles() {
+        for (let tile of this.currentPolygonContent) {
+            tile.tint = 0;
+        }
+        for (let tile of this.path.getArray()) {
+            tile.tint = 0;
+        }
+    }
+
+    private cleanUp() {
+        this.coords = this.resetCoords();
+        this.path = new Set();
+        this.currentPolygonContent = [];
     }
 }
