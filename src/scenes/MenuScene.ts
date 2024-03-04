@@ -14,24 +14,13 @@ export class MenuScene extends Phaser.Scene {
 
         let {width, height} = this.sys.game.canvas;
 
-        var deathOnBlackFields = this.add.text(width / 2 - 200, 200, "Death on black fields")
+        var deathOnBlackFields = this.add.text(width / 2 - 200, 200, "Start Game")
             .setScale(2.0, 2.0)
             .setColor('#ffffff');
         deathOnBlackFields.setInteractive();
 
         deathOnBlackFields.on("pointerup", () => {
-            this.scene.start(SCENES.PLAY, {blackDeathToggle: true})
-            this.scene.stop(SCENES.MENUBACKGROUND);
-        })
-
-
-        var noDeathOnBlackFields = this.add.text(width / 2 - 200, 300, "Ignore black fields")
-            .setScale(2.0, 2.0)
-            .setColor('#ffffff');
-        noDeathOnBlackFields.setInteractive();
-
-        noDeathOnBlackFields.on("pointerup", () => {
-            this.scene.start(SCENES.PLAY, {blackDeathToggle: false})
+            this.scene.start(SCENES.PLAY);
             this.scene.stop(SCENES.MENUBACKGROUND);
         })
 

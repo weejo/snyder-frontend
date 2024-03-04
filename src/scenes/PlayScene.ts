@@ -31,7 +31,6 @@ export class PlayScene extends Phaser.Scene {
     }
 
     init(data: any) {
-        this.blackDeathToggle = data.blackDeathToggle;
     }
 
     create() {
@@ -58,7 +57,7 @@ export class PlayScene extends Phaser.Scene {
 
     private setupScenes() {
         this.scene.launch(SCENES.HUD);
-        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map, blackDeathToggle: this.blackDeathToggle});
+        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map});
     }
 
     private setupPlayer() {

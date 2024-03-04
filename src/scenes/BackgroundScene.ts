@@ -1,4 +1,5 @@
 import {SCENES} from "../constants/scenes.ts";
+import {IMAGE} from "../constants/image.ts";
 
 export class MenuBackgroundScene extends Phaser.Scene {
     stars: Array<Phaser.GameObjects.Blitter> = [];
@@ -23,10 +24,6 @@ export class MenuBackgroundScene extends Phaser.Scene {
         this.zCoords = [];
     }
 
-    preload ()
-    {
-        this.load.image('star', 'assets/image/BackgroundStar.png');
-    }
 
     create ()
     {
@@ -36,7 +33,7 @@ export class MenuBackgroundScene extends Phaser.Scene {
             this.input.keyboard.enabled = false;
 
             // @ts-ignore
-            this.stars = this.add.blitter((width/4), (height/4), 'star');
+            this.stars = this.add.blitter((width/4), (height/4), IMAGE.STAR);
 
             for (let i = 0; i < this.maxStars; i++)
             {
