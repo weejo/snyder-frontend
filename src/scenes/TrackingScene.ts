@@ -12,7 +12,7 @@ export class TrackingScene extends Phaser.Scene {
     path: Set<Phaser.Tilemaps.Tile>;
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
-    coords: any;
+    coordsOfRectangle: any;
     bIsGameRunning: boolean;
     currentPolygon: Phaser.Tilemaps.Tile[];
     currentPolygonContent: Phaser.Tilemaps.Tile[];
@@ -25,7 +25,7 @@ export class TrackingScene extends Phaser.Scene {
         });
         this.path = new Set();
         this.lastTile = undefined;
-        this.coords = this.resetCoords();
+        this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
         this.currentPolygon = [];
         this.currentPolygonContent = [];
@@ -48,33 +48,43 @@ export class TrackingScene extends Phaser.Scene {
         if (this.bIsGameRunning) {
             var tile = this.map.getTileAtWorldXY(this.player.x, this.player.y);
 
-            if (tile == null) {
-                eventUtils.emit(EVENTS.GAMEOVER);
-            } else if (this.lastTile != tile) {
-                if (tile.tint == 0) {
-                    if (!this.isOnRecentlyCleanedPath) {
-                        if (this.blackDeathToggle) {
+            if (this.checkIfGameIsOver(tile)) return;
 
-                            eventUtils.emit(EVENTS.GAMEOVER);
-                        }
-                    }
+            tile = tile!;
+
+            if (this.lastTile != tile) {
+                if (this.path.contains(tile)) {
+                    this.currentPolygon = this.extractPolygon(tile);
+                    this.computePointsForGeneratedCluster();
+                    this.updateVisitedTiles();
+                    this.cleanUp();
+                    this.isOnRecentlyCleanedPath = true;
                 } else {
-                    console.log(this.path);
-                    if (this.path.contains(tile)) {
-                        this.currentPolygon = this.extractPolygon(tile);
-                        this.computePointsForGeneratedCluster();
-                        this.updateVisitedTiles();
-                        this.cleanUp();
-                        this.isOnRecentlyCleanedPath = true;
-                    } else {
-                        this.lastTile = tile;
-                        this.path.set(tile);
-                        this.updateCoords(tile);
-                        this.isOnRecentlyCleanedPath = false;
-                    }
+                    this.lastTile = tile;
+                    this.path.set(tile);
+                    this.updateCoordsOfRectangle(tile);
+                    this.isOnRecentlyCleanedPath = false;
                 }
             }
         }
+    }
+
+    private checkIfGameIsOver(tile: Phaser.Tilemaps.Tile | null): boolean {
+        if (tile == null) {
+            eventUtils.emit(EVENTS.GAMEOVER);
+            return true;
+        }
+
+        if (tile.tint == 0 && this.lastTile != tile) {
+            if (!this.isOnRecentlyCleanedPath) {
+                if (this.blackDeathToggle) {
+                    eventUtils.emit(EVENTS.GAMEOVER);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -101,8 +111,8 @@ export class TrackingScene extends Phaser.Scene {
         let points = 0;
         let counter = 0;
         let tiles = [];
-        for (let x = this.coords.lowestX; x < this.coords.highestX + 1; x++) {
-            for (let y = this.coords.lowestY; y < this.coords.highestY + 1; y++) {
+        for (let x = this.coordsOfRectangle.lowestX; x < this.coordsOfRectangle.highestX + 1; x++) {
+            for (let y = this.coordsOfRectangle.lowestY; y < this.coordsOfRectangle.highestY + 1; y++) {
                 if (this.isPointInsidePolygon(x, y)) {
                     var tileAtPosition = this.map.getTileAt(x, y);
                     if (tileAtPosition) {
@@ -113,7 +123,6 @@ export class TrackingScene extends Phaser.Scene {
                         points += tileAtPosition.index;
                         counter++;
                     }
-
                 }
             }
         }
@@ -128,11 +137,12 @@ export class TrackingScene extends Phaser.Scene {
     }
 
     private updateScore(average: number) {
+        if (average <= 0) return;
         var score = this.registry.get(REGISTRY.SCORE);
         score += average * CONFIG.SCORESCALE;
-        score.toFixed(2);
+        score = score.toFixed(2);
         this.registry.set(REGISTRY.SCORE, score);
-        eventUtils.emit(EVENTS.SCORECHANGE, score);
+        eventUtils.emit(EVENTS.SCORECHANGE);
     }
 
     /**
@@ -152,7 +162,7 @@ export class TrackingScene extends Phaser.Scene {
         return inside;
     }
 
-    private resetCoords() {
+    private resetCoordsOfRectangle() {
         return {
             highestX: Number.MIN_SAFE_INTEGER,
             lowestX: Number.MAX_SAFE_INTEGER,
@@ -161,18 +171,23 @@ export class TrackingScene extends Phaser.Scene {
         }
     }
 
-    private updateCoords(tile: Phaser.Tilemaps.Tile) {
-        if (tile.x > this.coords.highestX) {
-            this.coords.highestX = tile.x;
+    /**
+     * wtf?
+     * @param tile
+     * @private
+     */
+    private updateCoordsOfRectangle(tile: Phaser.Tilemaps.Tile) {
+        if (tile.x > this.coordsOfRectangle.highestX) {
+            this.coordsOfRectangle.highestX = tile.x;
         }
-        if (tile.x < this.coords.lowestX) {
-            this.coords.lowestX = tile.x;
+        if (tile.x < this.coordsOfRectangle.lowestX) {
+            this.coordsOfRectangle.lowestX = tile.x;
         }
-        if (tile.y > this.coords.highestY) {
-            this.coords.highestY = tile.y;
+        if (tile.y > this.coordsOfRectangle.highestY) {
+            this.coordsOfRectangle.highestY = tile.y;
         }
-        if (tile.y < this.coords.lowestY) {
-            this.coords.lowestY = tile.y;
+        if (tile.y < this.coordsOfRectangle.lowestY) {
+            this.coordsOfRectangle.lowestY = tile.y;
         }
     }
 
@@ -194,7 +209,7 @@ export class TrackingScene extends Phaser.Scene {
     }
 
     private cleanUp() {
-        this.coords = this.resetCoords();
+        this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.path = new Set();
         this.currentPolygonContent = [];
     }

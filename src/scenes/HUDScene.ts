@@ -2,6 +2,7 @@ import { SCENES } from "../constants/scenes";
 import {CONFIG} from "../constants/config.ts";
 import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
+import {REGISTRY} from "../constants/registry.ts";
 
 
 export class HUDScene extends Phaser.Scene {
@@ -27,7 +28,7 @@ export class HUDScene extends Phaser.Scene {
     private setupDisplays() {
         let { width, height } = this.sys.game.canvas;
 
-        this.scoreDisplay = this.add.text(width / 2, height / 10, "0")
+        this.scoreDisplay = this.add.text(width / 2, height / 10, this.registry.get(REGISTRY.SCORE))
             .setScale(2)
             .setColor('#FF0000');
 
@@ -57,7 +58,7 @@ export class HUDScene extends Phaser.Scene {
         this.bIsGameRunning = bIsRunning;
     }
 
-    private changeScoreDisplay(points: number) {
-        this.scoreDisplay.setText(points.toFixed(0).toString()).setColor('#FF0000')
+    private changeScoreDisplay() {
+        this.scoreDisplay.setText(this.registry.get(REGISTRY.SCORE)).setColor('#FF0000');
     }
 }
