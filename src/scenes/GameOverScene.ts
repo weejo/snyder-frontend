@@ -25,7 +25,7 @@ export class GameOverScene extends Phaser.Scene {
             .setScale(5)
             .setColor('#FFFFFF');
 
-        this.add.text(width / 2, height / 2, "Points: " + this.registry.get(REGISTRY.SCORE).toFixed(0).toString())
+        this.add.text(width / 2, height / 2, "Points: " + this.registry.get(REGISTRY.SCORE).toString())
             .setScale(5)
             .setColor('#FFFFFF');
 

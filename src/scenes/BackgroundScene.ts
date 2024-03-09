@@ -13,7 +13,7 @@ export class MenuBackgroundScene extends Phaser.Scene {
 
     constructor ()
     {
-        super({ key: SCENES.MENUBACKGROUND, active: true });
+        super({ key: SCENES.MENUBACKGROUND, active: false });
 
         this.speed = 250;
         this.spawnDistance=300;

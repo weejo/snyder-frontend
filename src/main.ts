@@ -5,8 +5,9 @@ import { PlayScene } from "./scenes/PlayScene.ts";
 import {HUDScene} from "./scenes/HUDScene.ts";
 import {TrackingScene} from "./scenes/TrackingScene.ts";
 import {GameOverScene} from "./scenes/GameOverScene.ts";
-import {MenuScene} from "./scenes/MenuScene.ts";
+import {MainMenuScene} from "./scenes/menu/MainMenuScene.ts";
 import {MenuBackgroundScene} from "./scenes/BackgroundScene.ts";
+import {InfoMenuScene} from "./scenes/menu/InfoMenuScene.ts";
 
 new Phaser.Game({
     scale: {
@@ -16,7 +17,7 @@ new Phaser.Game({
         width: 1920
     },
     scene: [
-        LoadScene, PlayScene, HUDScene, TrackingScene, GameOverScene, MenuScene, MenuBackgroundScene
+        LoadScene, PlayScene, HUDScene, TrackingScene, GameOverScene, MainMenuScene, MenuBackgroundScene, InfoMenuScene
     ],
     render: {
         // so it doesn't default sharpen images. I hope.

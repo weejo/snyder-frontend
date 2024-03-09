@@ -1,17 +1,24 @@
-import {SCENES} from "../constants/scenes.ts";
+import {SCENES} from "../../constants/scenes.ts";
 
 
-export class MenuScene extends Phaser.Scene {
+export class MainMenuScene extends Phaser.Scene {
     constructor() {
         super({
-            key: SCENES.MENU, active: true
+            key: SCENES.MAINMENU, active: false
         });
+    }
+
+    init(data: any) {
+
     }
 
     create() {
         //create images (z order)
-        this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
+        if(!this.scene.isActive(SCENES.MENUBACKGROUND)) {
+            this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
+        }
 
+        /*
         let {width, height} = this.sys.game.canvas;
 
         var deathOnBlackFields = this.add.text(width / 2 - 200, 200, "Start Game")
@@ -22,7 +29,7 @@ export class MenuScene extends Phaser.Scene {
         deathOnBlackFields.on("pointerup", () => {
             this.scene.start(SCENES.PLAY);
             this.scene.stop(SCENES.MENUBACKGROUND);
-        })
+        })*/
 
     }
 }

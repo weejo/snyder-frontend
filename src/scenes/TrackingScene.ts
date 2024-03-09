@@ -5,11 +5,14 @@ import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {CONFIG} from "../constants/config.ts";
 import Set = Phaser.Structs.Set;
+import {IMAGE} from "../constants/image.ts";
+import List = Phaser.Structs.List;
 
 export class TrackingScene extends Phaser.Scene {
     player: any;
     lastTile?: Phaser.Tilemaps.Tile;
     path: Set<Phaser.Tilemaps.Tile>;
+    pathLights: Phaser.GameObjects.Sprite[];
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
     coordsOfRectangle: any;
@@ -24,6 +27,7 @@ export class TrackingScene extends Phaser.Scene {
             key: SCENES.TRACKING, active: true
         });
         this.path = new Set();
+        this.pathLights = [];
         this.lastTile = undefined;
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
@@ -59,10 +63,7 @@ export class TrackingScene extends Phaser.Scene {
                     this.cleanUp();
                     this.isOnRecentlyCleanedPath = true;
                 } else {
-                    this.lastTile = tile;
-                    this.path.set(tile);
-                    this.updateCoordsOfRectangle(tile);
-                    this.isOnRecentlyCleanedPath = false;
+                    this.extendPath(tile);
                 }
             }
         }
@@ -209,5 +210,21 @@ export class TrackingScene extends Phaser.Scene {
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.path = new Set();
         this.currentPolygonContent = [];
+        for (let pathLight of this.pathLights) {
+            pathLight.destroy(true);
+        }
+        this.pathLights = [];
     }
+
+    private extendPath(tile: Phaser.Tilemaps.Tile) {
+        this.lastTile = tile;
+        this.path.set(tile);
+
+        tile.tint = 0.9;
+
+        this.updateCoordsOfRectangle(tile);
+        this.isOnRecentlyCleanedPath = false;
+    }
+
+
 }

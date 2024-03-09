@@ -3,10 +3,12 @@ import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {REGISTRY} from "../constants/registry.ts";
 import {IMAGE} from "../constants/image.ts";
+import {TILESET} from "../constants/tilesets.ts";
 
 export class PlayScene extends Phaser.Scene {
 
     player: any;
+    emitter: any;
     cursors: any;
     map: any;
     tileset: any;
@@ -22,15 +24,14 @@ export class PlayScene extends Phaser.Scene {
         this.blackDeathToggle = false;
     }
 
+    init(data: any) {
+
+    }
+
     preload() {
         //this.load.tilemapTiledJSON('map', "http://localhost:8080/level?levelId=8" );
 
-        this.load.image('base_tiles', 'assets/tileset.png')
-
         this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
-    }
-
-    init(data: any) {
     }
 
     create() {
@@ -63,18 +64,27 @@ export class PlayScene extends Phaser.Scene {
     private setupPlayer() {
         // @ts-ignore
         this.cursors = this.input.keyboard.createCursorKeys();
+
+
+        // emitter
+        this.emitter = this.add.particles(0, 0, IMAGE.BRUSH, {
+            frame: 'blue',
+            speed: 100,
+            blendMode: 'ADD',
+
+        });
         this.player = this.physics.add.image(100, 100, IMAGE.SHIP);
-        this.player.setPosition(100,100);
+
+        this.emitter.startFollow(this.player);
+
+
 
         // movement stuff
-        this.player.setDamping(true);
-        this.player.setDrag(0.99);
-        this.player.setMaxVelocity(500);
-
-
+        this.player.setDrag(300);
+        this.player.setAngularDrag(400);
+        this.player.setMaxVelocity(600);
 
         this.physics.world.setBounds(0,0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
-        this.player.setCollideWorldBounds(true);
 
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setZoom(0.5, 0.5);
@@ -83,9 +93,9 @@ export class PlayScene extends Phaser.Scene {
     private prepareMap() {
         this.map = this.make.tilemap({key: 'tilemap'})
 
-        this.tileset = this.map.addTilesetImage('backgroundtileset', 'base_tiles')
+        this.tileset = this.map.addTilesetImage('backgroundtileset', TILESET.BASE);
 
-        this.map.createLayer('umap_iris', this.tileset)
+        this.map.createLayer('umap_iris', this.tileset, 0,0);
     }
 
     private setupEventListeners() {
@@ -98,23 +108,30 @@ export class PlayScene extends Phaser.Scene {
             eventUtils.emit(EVENTS.GAMESTART, true);
         }
 
-        if (this.cursors.up.isDown) {
-            this.physics.velocityFromRotation(this.player.rotation, 500, this.player.body.acceleration);
-        } else {
-            this.player.setAcceleration(0);
-        }
+        const { left, right, up } = this.cursors;
 
-        if (this.cursors.left.isDown)
+        if (left.isDown)
         {
-            this.player.setAngularVelocity(-200);
+            this.player.setAngularVelocity(-150);
         }
-        else if (this.cursors.right.isDown)
+        else if (right.isDown)
         {
-            this.player.setAngularVelocity(200);
+            this.player.setAngularVelocity(150);
         }
         else
         {
             this.player.setAngularVelocity(0);
+        }
+
+        if (up.isDown)
+        {
+            this.emitter.start();
+            this.physics.velocityFromRotation(this.player.rotation, 600, this.player.body.acceleration);
+        }
+        else
+        {
+            this.player.setAcceleration(0);
+            this.emitter.stop();
         }
 
     }
