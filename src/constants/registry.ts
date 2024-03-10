@@ -1,4 +1,5 @@
 export const REGISTRY = {
     CLUSTER:"CLUSTER",
-    SCORE: "SCORE"
+    SCORE: "SCORE",
+    OVERVIEW: "OVERVIEW"
 }

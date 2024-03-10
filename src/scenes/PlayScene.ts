@@ -14,6 +14,7 @@ export class PlayScene extends Phaser.Scene {
     tileset: any;
     gameStarted: boolean;
     blackDeathToggle: boolean;
+    levelId: number;
 
 
     constructor() {
@@ -22,14 +23,15 @@ export class PlayScene extends Phaser.Scene {
         });
         this.gameStarted = false;
         this.blackDeathToggle = false;
+        this.levelId = 0;
     }
 
     init(data: any) {
-
+        this.levelId = data.levelId;
     }
 
     preload() {
-        //this.load.tilemapTiledJSON('map', "http://localhost:8080/level?levelId=8" );
+        //this.load.tilemapTiledJSON('tilemap', "http://localhost:8080/level?levelId=" + this.levelId );
 
         this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
     }

@@ -2,6 +2,9 @@ import {SCENES} from "../constants/scenes.ts";
 import {IMAGE} from "../constants/image.ts";
 import {TILESET} from "../constants/tilesets.ts";
 import {CONTENT} from "../constants/content.ts";
+import {LOCALSTORAGE} from "../constants/localstorage.ts";
+import {URLS} from "../constants/urls.ts";
+import {REGISTRY} from "../constants/registry.ts";
 
 
 export class LoadScene extends Phaser.Scene {
@@ -42,18 +45,6 @@ export class LoadScene extends Phaser.Scene {
     }
 
     preload() {
-        //this.load.json('overviewData', Scenes.URLS.OVERVIEW);
-
-        //load images, spritesheet, sounds
-        this.loadImages();
-
-        this.loadTilesets();
-
-        this.loadSprites({
-            frameHeight: 100,
-            frameWidth: 100
-        });
-
         //create loading bar
         let loadingBar = this.add.graphics({
             fillStyle: {
@@ -65,13 +56,38 @@ export class LoadScene extends Phaser.Scene {
             loadingBar.fillRect(0, this.game.renderer.height / 2, this.game.renderer.width * percent, 50);
         })
 
+        this.load.json('overviewData', URLS.OVERVIEW);
+
+        //load images, spritesheet, sounds
+        this.loadImages();
+
+        this.loadTilesets();
+
+        this.loadSprites({
+            frameHeight: 100,
+            frameWidth: 100
+        });
+
+
+
     }
 
     create() {
-        // this.overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
+        var overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
+        this.registry.set(REGISTRY.OVERVIEW, overviewData.overviewLevels);
 
         this.createAnims();
-        this.scene.start(SCENES.INFOMENU, {contentKey: CONTENT.INFO, nextSceneKey: SCENES.MAINMENU, buttonText: "Continue"});
+
+        if (localStorage.getItem(LOCALSTORAGE.FIRST_PLAY) == null) {
+            localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "1");
+        }
+
+
+        this.scene.start(SCENES.INFOMENU, {
+            contentKey: CONTENT.INFO,
+            nextSceneKey: SCENES.MAINMENU,
+            buttonText: "Continue"
+        });
     }
 
     private createAnims() {

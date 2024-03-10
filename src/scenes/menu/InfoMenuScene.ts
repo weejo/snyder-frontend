@@ -1,5 +1,5 @@
 import {SCENES} from "../../constants/scenes.ts";
-import {CONTENT} from "../../constants/content.ts";
+import {Button} from "../../containers/Button.ts";
 
 
 export class InfoMenuScene extends Phaser.Scene {
@@ -8,6 +8,7 @@ export class InfoMenuScene extends Phaser.Scene {
     content: string;
     nextSceneKey: string;
     buttonText: string;
+    nextSceneData: any;
 
 
     constructor() {
@@ -24,6 +25,7 @@ export class InfoMenuScene extends Phaser.Scene {
     init(data: any) {
         this.contentKey = data.contentKey;
         this.nextSceneKey = data.nextSceneKey;
+        this.nextSceneData = data.nextSceneData;
         this.buttonText = data.buttonText;
     }
 
@@ -55,7 +57,7 @@ export class InfoMenuScene extends Phaser.Scene {
 
     create() {
         //create images (z order)
-        if(!this.scene.isActive(SCENES.MENUBACKGROUND)) {
+        if (!this.scene.isActive(SCENES.MENUBACKGROUND)) {
             this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
         }
 
@@ -63,30 +65,14 @@ export class InfoMenuScene extends Phaser.Scene {
 
         this.displayContent();
 
-        this.addButton();
+        new Button(this, 9, this.buttonText, this.nextSceneKey, this.nextSceneData);
     }
 
     displayContent() {
-        let {width, height} = this.sys.game.canvas;
+        let {width} = this.sys.game.canvas;
 
         this.add.text(width / 4, 200, this.content)
             .setScale(2.5, 2.5)
             .setColor('#ffffff');
-    }
-
-    private addButton() {
-        let {width, height} = this.sys.game.canvas;
-
-        var nextButton = this.add.text(width / 2 - 100, height - 200, this.buttonText)
-            .setScale(2.0, 2.0)
-            .setColor('#ffffff');
-        nextButton.setInteractive();
-
-        nextButton.on("pointerup", () => {
-            this.scene.start(this.nextSceneKey);
-            if (this.nextSceneKey == SCENES.PLAY) {
-                this.scene.stop(SCENES.MENUBACKGROUND);
-            }
-        })
     }
 }
