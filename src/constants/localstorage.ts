@@ -1,4 +1,4 @@
 export const LOCALSTORAGE = {
-    SURVEY: "SURVEY",
-    FIRST_PLAY: "FIRST_PLAY"
+    FIRST_PLAY: "FIRST_PLAY",
+    USERNAME: "USERNAME"
 }

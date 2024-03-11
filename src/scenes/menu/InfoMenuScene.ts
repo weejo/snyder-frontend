@@ -6,10 +6,7 @@ export class InfoMenuScene extends Phaser.Scene {
 
     contentKey: string;
     content: string;
-    nextSceneKey: string;
     buttonText: string;
-    nextSceneData: any;
-
 
     constructor() {
         super({
@@ -17,15 +14,12 @@ export class InfoMenuScene extends Phaser.Scene {
         });
         this.contentKey = "";
         this.content = "";
-        this.nextSceneKey = "";
         this.buttonText = "";
 
     }
 
     init(data: any) {
         this.contentKey = data.contentKey;
-        this.nextSceneKey = data.nextSceneKey;
-        this.nextSceneData = data.nextSceneData;
         this.buttonText = data.buttonText;
     }
 
@@ -65,14 +59,14 @@ export class InfoMenuScene extends Phaser.Scene {
 
         this.displayContent();
 
-        new Button(this, 9, this.buttonText, this.nextSceneKey, this.nextSceneData);
+        new Button(this, 9, this.buttonText);
     }
 
     displayContent() {
         let {width} = this.sys.game.canvas;
 
-        this.add.text(width / 4, 200, this.content)
-            .setScale(2.5, 2.5)
+        this.add.text(width / 5, 200, this.content, {fontFamily: 'atari'})
+            .setScale(2, 2)
             .setColor('#ffffff');
     }
 }

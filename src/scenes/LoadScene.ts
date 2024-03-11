@@ -1,10 +1,9 @@
 import {SCENES} from "../constants/scenes.ts";
 import {IMAGE} from "../constants/image.ts";
 import {TILESET} from "../constants/tilesets.ts";
-import {CONTENT} from "../constants/content.ts";
-import {LOCALSTORAGE} from "../constants/localstorage.ts";
 import {URLS} from "../constants/urls.ts";
 import {REGISTRY} from "../constants/registry.ts";
+import {SceneFlowManager} from "./SceneFlowManager.ts";
 
 
 export class LoadScene extends Phaser.Scene {
@@ -69,25 +68,22 @@ export class LoadScene extends Phaser.Scene {
         });
 
 
-
     }
 
     create() {
         var overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
         this.registry.set(REGISTRY.OVERVIEW, overviewData.overviewLevels);
 
+
         this.createAnims();
 
-        if (localStorage.getItem(LOCALSTORAGE.FIRST_PLAY) == null) {
-            localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "1");
-        }
+        //  this.scene.launch(SCENES.FLOWMANAGER);
+        var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
 
+        const {key, data} = flowmanager.getNextScene();
 
-        this.scene.start(SCENES.INFOMENU, {
-            contentKey: CONTENT.INFO,
-            nextSceneKey: SCENES.MAINMENU,
-            buttonText: "Continue"
-        });
+        this.scene.start(key, data);
+
     }
 
     private createAnims() {

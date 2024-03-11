@@ -1,5 +1,7 @@
 import {IMAGE} from "../constants/image.ts";
 import {SCENES} from "../constants/scenes.ts";
+import {SceneFlowManager} from "../scenes/SceneFlowManager.ts";
+import {FLOW} from "../constants/flow.ts";
 
 export class Button extends Phaser.GameObjects.Container {
     name!: string;
@@ -10,10 +12,9 @@ export class Button extends Phaser.GameObjects.Container {
     renderHeight!: number;
     content!: string;
     scale: number;
-    nextSceneKey: string;
-    nextSceneData: any;
+    flow: string;
 
-    constructor(scene: Phaser.Scene, lineNumber: number, content: string, nextSceneKey: string, nextSceneData: any = {}, scale: number = 2) {
+    constructor(scene: Phaser.Scene, lineNumber: number, content: string, flow: string = FLOW.NOFLOW, scale: number = 2) {
         super(scene, undefined);
         let {width, height} = this.scene.sys.game.canvas;
 
@@ -22,8 +23,8 @@ export class Button extends Phaser.GameObjects.Container {
         this.content = content;
         this.x = (width / 2);
         this.scale = scale;
-        this.nextSceneKey = nextSceneKey;
-        this.nextSceneData = nextSceneData;
+        this.flow = flow;
+
         // scale * 16 => default scale is 1.5, to make the renderwidth fit we go for *16, otherwise not all of the scaled up text would be displayed.
         this.renderWidth = content.length * (scale * 16);
 
@@ -49,8 +50,8 @@ export class Button extends Phaser.GameObjects.Container {
             spaceshipLeft.setVisible(true);
             spaceshipRight.setVisible(true);
 
-            spaceshipLeft.x = this.x - (this.width / 2) - 125;
-            spaceshipRight.x = this.x + (this.width / 2) + 50;
+            spaceshipLeft.x = this.x - (this.width / 2) - 75;
+            spaceshipRight.x = this.x + (this.width / 2) + 75;
 
             spaceshipLeft.y = this.y;
             spaceshipRight.y = this.y;
@@ -63,17 +64,20 @@ export class Button extends Phaser.GameObjects.Container {
         })
 
         this.on("pointerup", () => {
+            var flowmanager = this.scene.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
 
-            let nextScene = this.scene.scene.get(this.nextSceneKey);
+            const {key, data} = flowmanager.getNextScene(this.flow);
+
+            let nextScene = this.scene.scene.get(key);
 
             if (nextScene == undefined) {
                 //this.scene.scene.add(this.nextSceneKey, PlayScene, false, );
                 console.error("Scene is undefined - shit hit the fan");
             }
 
-            this.scene.scene.start(this.nextSceneKey, this.nextSceneData);
+            this.scene.scene.start(key, data);
 
-            if (this.nextSceneKey == SCENES.PLAY) {
+            if (key == SCENES.PLAY) {
                 this.scene.scene.stop(SCENES.MENUBACKGROUND);
             }
         })
@@ -83,7 +87,7 @@ export class Button extends Phaser.GameObjects.Container {
         graphics.lineStyle(1, 0xff0000);
         graphics.fillStyle(0x02455f, .5);
 
-        let text = this.scene.add.text(0, 40, this.content)
+        let text = this.scene.add.text(0, 40, this.content, {fontFamily: 'atari'})
             .setScale(this.scale)
             .setColor('#ffffff');
 

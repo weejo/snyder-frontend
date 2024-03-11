@@ -1,4 +1,4 @@
-export class Text extends Phaser.GameObjects.Container {
+export class TextField extends Phaser.GameObjects.Container {
     name!: string;
     x!: number;
     y!: number;
@@ -33,7 +33,7 @@ export class Text extends Phaser.GameObjects.Container {
         graphics.lineStyle(1, 0xff0000);
         graphics.fillStyle(0x02455f, .5);
 
-        let text = this.scene.add.text(0, 40, this.content)
+        let text = this.scene.add.text(0, 40, this.content, {fontFamily: 'atari'})
             .setScale(this.scale)
             .setColor('#ffffff');
 
