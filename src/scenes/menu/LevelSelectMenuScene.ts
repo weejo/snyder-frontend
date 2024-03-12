@@ -24,6 +24,8 @@ export class LevelSelectMenuScene extends Phaser.Scene {
 
         let counter = 3;
 
+        new Button(this, 9, this.buttonText);
+
         levelOverviewData.forEach((levelData: { name: string; size: string; }) => {
             var content = "level: " + levelData.name + "; size: " + levelData.size;
 
@@ -31,7 +33,5 @@ export class LevelSelectMenuScene extends Phaser.Scene {
 
             counter++;
         });
-
-        new Button(this, 9, this.buttonText);
     }
 }

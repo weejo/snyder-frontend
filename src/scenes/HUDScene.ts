@@ -15,11 +15,12 @@ export class HUDScene extends Phaser.Scene {
     constructor() {
         super({key: SCENES.HUD, active: false});
         this.bIsGameRunning = false;
-        this.gameTime = 0;
+        this.gameTime = 60000;
     }
 
     init(data: any) {
-        this.gameTime = data.gameTime;
+        this.gameTime = data.gameTime * 1000;
+
     }
 
     create() {

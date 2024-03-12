@@ -145,6 +145,9 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private gameOver() {
+        if (this.gameStarted) {
+            this.gameStarted = false;
+
         var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
 
         const {key, data} = flowmanager.getNextScene();
@@ -158,6 +161,7 @@ export class PlayScene extends Phaser.Scene {
         this.scene.stop(SCENES.HUD);
         this.scene.stop(SCENES.PLAY);
         this.scene.start(key, data);
+        }
     }
 
     private setupDebugInput(help: Phaser.GameObjects.Text) {

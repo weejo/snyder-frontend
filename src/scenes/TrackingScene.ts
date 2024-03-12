@@ -5,8 +5,6 @@ import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {CONFIG} from "../constants/config.ts";
 import Set = Phaser.Structs.Set;
-import {IMAGE} from "../constants/image.ts";
-import List = Phaser.Structs.List;
 
 export class TrackingScene extends Phaser.Scene {
     player: any;
@@ -137,6 +135,9 @@ export class TrackingScene extends Phaser.Scene {
     private updateScore(average: number) {
         if (average <= 0) return;
         var score = this.registry.get(REGISTRY.SCORE);
+        if (isNaN(score)) {
+            score = 0;
+        }
         score += average * CONFIG.SCORESCALE;
         score = score.toFixed(2);
         this.registry.set(REGISTRY.SCORE, score);

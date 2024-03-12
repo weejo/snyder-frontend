@@ -43,7 +43,6 @@ export class InputMenuScene extends Phaser.Scene {
 
     create() {
         let {width, height} = this.sys.game.canvas;
-
         this.displayContent();
 
         // this block is used to mark the currently selected character drawn to the screen.
@@ -81,7 +80,7 @@ export class InputMenuScene extends Phaser.Scene {
 
                 key.on("pointerup", () => {
                     let currentText = this.nameField.text;
-                    this.nameField.text = currentText.substring(0, currentText.length - 1);;
+                    this.nameField.text = currentText.substring(0, currentText.length - 1);
                     localStorage.setItem(LOCALSTORAGE.USERNAME, this.nameField.text);
                 });
             } else {

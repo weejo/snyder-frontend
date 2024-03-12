@@ -22,12 +22,16 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     create() {
-        localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "1");
+        if (localStorage.getItem(LOCALSTORAGE.FIRST_PLAY) == null) {
+            localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "1");
+        }
+
     }
 
     public getNextScene(newFLOW: string = FLOW.NOFLOW) {
         if (newFLOW != FLOW.NOFLOW) {
             this.currentFlow = newFLOW;
+            this.position = 0;
         }
 
         var flowArray = this.flowMap.get(this.currentFlow);
@@ -53,6 +57,18 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     private addStartupFlow() {
+        if (localStorage.getItem(LOCALSTORAGE.USERNAME) != null) {
+            return [
+                {
+                    key: SCENES.INFOMENU,
+                    data: {contentKey: CONTENT.INFO, buttonText: this.generateButtonText()}
+                },
+                {
+                    key: SCENES.MAINMENU,
+                    data: {}
+                }
+            ]
+        }
         return [
             {
                 key: SCENES.INFOMENU,
@@ -70,10 +86,11 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     private addFirstGameFlow() {
-        var levelId = 0;
+        var levelData;
         for (let data of this.overviewData) {
             if (data.name == "umap_iris") {
-                levelId = data.levelId;
+                levelData = data;
+                break;
             }
         }
 
@@ -84,7 +101,7 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelId, gameTime: 15}
+                data: {levelId: levelData.levelId, gameTime: 15}
             },
             {
                 key: SCENES.INFOMENU,
@@ -92,11 +109,11 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelId, gameTime: 60}
+                data: {levelId: levelData.levelId, gameTime: 60}
             },
             {
                 key: SCENES.GAMEOVER,
-                data: {content: this.generateGameOverMessage(), buttonText: "Back to the Menu!"}
+                data: {content: this.generateGameOverMessage(), buttonText: "Back to the Menu!", levelData: levelData}
             },
             {
                 key: SCENES.MAINMENU,
@@ -117,14 +134,14 @@ export class SceneFlowManager extends Phaser.Scene {
             "Houston, we had a problem!",
             "Looks like you spaced out!",
             "You did great, or something like that...",
-            "Your diary's final entry: 'Should've taken that left turn'",
-            "In space, no one can hear you scream... but they definitely saw that crash.",
-            "Warning: Sudden stops can be harmful to your body's structural integrity!",
-            "Achievement Unlocked: Galactic Pancake. Try not to flatten your ship next time.",
-            "You've boldly gone where many have gone before... the game-over screen.",
-            "Pro Tip: Spacecraft are not designed for head-on introductions to obstacles.",
-            "Remember, space is vast, but it's not always empty. Watch out for that... Oh, too late.",
-            "It's not a bug, it's a feature: Instant spaceship recycling!"
+            "Your diary's final entry:\n'Should've taken that left turn'",
+            "In space, no one can hear you scream...\nbut they definitely saw that crash.",
+            "Warning:\nSudden stops can be harmful to your body's structural integrity!",
+            "Achievement Unlocked: \nGalactic Pancake. Try not to flatten your ship next time.",
+            "You've boldly gone where many have gone before...\nthe game-over screen.",
+            "Pro Tip:\nSpacecraft are not designed for head-on introductions to obstacles.",
+            "Remember, space is vast, but it's not always empty.\nWatch out for that... Oh, too late.",
+            "It's not a bug, it's a feature:\nInstant spaceship recycling!"
         ];
         var randomInt = constUtils.getRandomInt(texts.length);
         return texts[randomInt];
@@ -189,7 +206,7 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.GAMEOVER,
-                data: {content: this.generateGameOverMessage(), buttonText: this.generateButtonText()}
+                data: {content: this.generateGameOverMessage(), buttonText: this.generateButtonText(), levelData: levelData}
             },
             {
                 key: SCENES.HIGHSCORE,

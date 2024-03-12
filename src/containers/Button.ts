@@ -90,28 +90,9 @@ export class Button extends Phaser.GameObjects.Container {
             }
         })
 
-
-        let graphics = this.scene.make.graphics();
-        graphics.lineStyle(1, 0xff0000);
-        graphics.fillStyle(0x02455f, .5);
-
-        let text = this.scene.add.text(0, 40, this.content, {fontFamily: 'atari'})
+        this.scene.add.text(this.x, this.y, this.content, {fontFamily: 'atari'})
             .setScale(this.scale)
-            .setColor('#ffffff');
-
-        let renderTexture = this.scene.add.renderTexture(this.x, this.y, this.renderWidth, this.renderHeight);
-
-        renderTexture.draw(graphics);
-        renderTexture.draw(text);
-        let imgName = 'levelOptionImage' + Math.random();
-
-        renderTexture.saveTexture(imgName);
-
-        graphics.destroy();
-        text.destroy();
-        renderTexture.destroy();
-
-        this.scene.add.image(this.x, this.y, imgName).setOrigin(.5);
-
+            .setColor('#ffffff')
+            .setOrigin(0.5);
     }
 }

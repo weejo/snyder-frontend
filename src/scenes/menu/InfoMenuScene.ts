@@ -1,5 +1,6 @@
 import {SCENES} from "../../constants/scenes.ts";
 import {Button} from "../../containers/Button.ts";
+import {TextField} from "../../containers/TextField.ts";
 
 
 export class InfoMenuScene extends Phaser.Scene {
@@ -57,7 +58,7 @@ export class InfoMenuScene extends Phaser.Scene {
 
         this.content = this.cache.text.get(this.contentKey);
 
-        this.displayContent();
+        new TextField(this, 4, this.content);
 
         new Button(this, 9, this.buttonText);
     }

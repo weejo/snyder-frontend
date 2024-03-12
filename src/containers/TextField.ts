@@ -21,35 +21,11 @@ export class TextField extends Phaser.GameObjects.Container {
         // scale * 16 => default scale is 1.5, to make the renderwidth fit we go for *16, otherwise not all of the scaled up text would be displayed.
         this.renderWidth = content.length * (scale * 16);
 
-        this.renderHeight = 75;
+        this.renderHeight = 75 * scale;
 
-        this.setSize(this.renderWidth, this.renderHeight)
-        this.setInteractive();
-        this.create();
-    }
-
-    create() {
-        let graphics = this.scene.make.graphics();
-        graphics.lineStyle(1, 0xff0000);
-        graphics.fillStyle(0x02455f, .5);
-
-        let text = this.scene.add.text(0, 40, this.content, {fontFamily: 'atari'})
-            .setScale(this.scale)
-            .setColor('#ffffff');
-
-        let renderTexture = this.scene.add.renderTexture(this.x, this.y, this.renderWidth, this.renderHeight);
-
-        renderTexture.draw(graphics);
-        renderTexture.draw(text);
-        let imgName = 'levelOptionImage' + Math.random();
-
-        renderTexture.saveTexture(imgName);
-
-        graphics.destroy();
-        text.destroy();
-        renderTexture.destroy();
-
-        this.scene.add.image(this.x, this.y, imgName).setOrigin(.5);
-
+        this.scene.add.text(this.x, this.y, this.content, {fontFamily: 'atari'})
+            .setScale(scale, scale)
+            .setColor('#ffffff')
+            .setOrigin(0.5);
     }
 }

@@ -3,6 +3,7 @@ import {REGISTRY} from "../constants/registry.ts";
 import {URLS} from "../constants/urls.ts";
 import {TextField} from "../containers/TextField.ts";
 import {Button} from "../containers/Button.ts";
+import {LOCALSTORAGE} from "../constants/localstorage.ts";
 
 export class GameOverScene extends Phaser.Scene {
     levelId: number;
@@ -16,11 +17,10 @@ export class GameOverScene extends Phaser.Scene {
         this.levelId = 0;
         this.content = "Hurr Durr!?";
         this.buttonText = "Durr!";
-
     }
 
     init(data: any) {
-        this.levelId = data.levelId;
+        this.levelId = data.levelData.levelId;
         this.content = data.content;
         this.buttonText = data.buttonText;
     }
@@ -31,18 +31,21 @@ export class GameOverScene extends Phaser.Scene {
         }
         this.publishData();
 
-
-
         new TextField(this, 2, "Game Over", 3);
 
-        new TextField(this, 4, this.content);
+        new TextField(this, 4, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 3);
 
-        new TextField(this, 6, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 3);
+        new TextField(this, 6, this.content);
 
         new Button(this, 8, this.buttonText);
     }
 
     private publishData() {
+        var entry = {
+            points: this.registry.get(REGISTRY.SCORE),
+            name: localStorage.getItem(LOCALSTORAGE.USERNAME)
+        }
+
         fetch(URLS.ADDRESULT, {
             method: 'POST',
             headers: {
@@ -50,11 +53,10 @@ export class GameOverScene extends Phaser.Scene {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "entry": null,// TODO: ADD REAL PLAYER DATA HERE
+                "entry": entry,
                 "levelId": this.levelId,
                 "data": this.registry.get(REGISTRY.CLUSTER)
             })
-
         }).then();
     }
 }
