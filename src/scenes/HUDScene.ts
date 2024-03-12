@@ -1,5 +1,4 @@
-import { SCENES } from "../constants/scenes";
-import {CONFIG} from "../constants/config.ts";
+import {SCENES} from "../constants/scenes";
 import eventUtils from "../utils/eventUtils.ts";
 import {EVENTS} from "../constants/events.ts";
 import {REGISTRY} from "../constants/registry.ts";
@@ -11,12 +10,16 @@ export class HUDScene extends Phaser.Scene {
     // @ts-ignore
     timeDisplay: Phaser.GameObjects.Text;
     bIsGameRunning: boolean;
-    timer: number;
+    gameTime: number;
 
     constructor() {
-        super({ key: SCENES.HUD, active: false });
+        super({key: SCENES.HUD, active: false});
         this.bIsGameRunning = false;
-        this.timer = CONFIG.ROUNDTIME;
+        this.gameTime = 0;
+    }
+
+    init(data: any) {
+        this.gameTime = data.gameTime;
     }
 
     create() {
@@ -26,13 +29,13 @@ export class HUDScene extends Phaser.Scene {
     }
 
     private setupDisplays() {
-        let { width, height } = this.sys.game.canvas;
+        let {width, height} = this.sys.game.canvas;
 
         this.scoreDisplay = this.add.text(width / 2, height / 10, this.registry.get(REGISTRY.SCORE))
             .setScale(2)
             .setColor('#FF0000');
 
-        this.timeDisplay = this.add.text(width / 2, height - 100, (this.timer/1000).toString())
+        this.timeDisplay = this.add.text(width / 2, height - 100, (this.gameTime / 1000).toString())
             .setScale(2)
             .setColor('#FF0000');
     }
@@ -44,10 +47,10 @@ export class HUDScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number) {
-        if(this.bIsGameRunning) {
-            if (this.timer > 0) {
-                this.timer -= delta;
-                this.timeDisplay.setText( (this.timer/1000).toFixed(1).toString()).setColor('#FF0000')
+        if (this.bIsGameRunning) {
+            if (this.gameTime > 0) {
+                this.gameTime -= delta;
+                this.timeDisplay.setText((this.gameTime / 1000).toFixed(1).toString()).setColor('#FF0000')
             } else {
                 eventUtils.emit(EVENTS.GAMEOVER);
             }

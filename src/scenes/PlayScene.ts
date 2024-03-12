@@ -4,6 +4,7 @@ import {EVENTS} from "../constants/events.ts";
 import {REGISTRY} from "../constants/registry.ts";
 import {IMAGE} from "../constants/image.ts";
 import {TILESET} from "../constants/tilesets.ts";
+import {SceneFlowManager} from "./SceneFlowManager.ts";
 
 export class PlayScene extends Phaser.Scene {
 
@@ -15,6 +16,7 @@ export class PlayScene extends Phaser.Scene {
     gameStarted: boolean;
     blackDeathToggle: boolean;
     levelId: number;
+    gameTime: number;
 
 
     constructor() {
@@ -24,10 +26,15 @@ export class PlayScene extends Phaser.Scene {
         this.gameStarted = false;
         this.blackDeathToggle = false;
         this.levelId = 0;
+        this.gameTime = 60;
     }
 
-    init(data: any) {
+    init(data: { levelId: number, gameTime: number | null }) {
         this.levelId = data.levelId;
+        if(data.gameTime != null) {
+            this.gameTime = data.gameTime;
+        }
+
     }
 
     preload() {
@@ -59,7 +66,7 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private setupScenes() {
-        this.scene.launch(SCENES.HUD);
+        this.scene.launch(SCENES.HUD, {gameTime: this.gameTime});
         this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map});
     }
 
@@ -78,7 +85,6 @@ export class PlayScene extends Phaser.Scene {
         this.player = this.physics.add.image(100, 100, IMAGE.SHIP);
 
         this.emitter.startFollow(this.player);
-
 
 
         // movement stuff
@@ -139,10 +145,19 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private gameOver() {
+        var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
+
+        const {key, data} = flowmanager.getNextScene();
+
+        let nextScene = this.scene.get(key);
+
+        if (nextScene == undefined) {
+            console.error("Scene is undefined - shit hit the fan");
+        }
         this.scene.stop(SCENES.TRACKING);
         this.scene.stop(SCENES.HUD);
         this.scene.stop(SCENES.PLAY);
-        this.scene.start(SCENES.GAMEOVER);
+        this.scene.start(key, data);
     }
 
     private setupDebugInput(help: Phaser.GameObjects.Text) {

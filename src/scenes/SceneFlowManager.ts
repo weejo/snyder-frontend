@@ -2,6 +2,7 @@ import {SCENES} from "../constants/scenes.ts";
 import {CONTENT} from "../constants/content.ts";
 import {FLOW} from "../constants/flow.ts";
 import {LOCALSTORAGE} from "../constants/localstorage.ts";
+import {constUtils} from "../utils/constUtils.ts";
 
 export class SceneFlowManager extends Phaser.Scene {
 
@@ -60,11 +61,11 @@ export class SceneFlowManager extends Phaser.Scene {
         return [
             {
                 key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.INFO, buttonText: "Continue"}
+                data: {contentKey: CONTENT.INFO, buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.INPUTMENU,
-                data: {contentKey: CONTENT.SETNAME, buttonText: "Let's go!"}
+                data: {contentKey: CONTENT.SETNAME, buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.MAINMENU,
@@ -77,20 +78,30 @@ export class SceneFlowManager extends Phaser.Scene {
         return [
             {
                 key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.FIRST_TIME, buttonText: "Continue"}
+                data: {contentKey: CONTENT.FIRST_TIME_START, buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: 0} // TODO proper id via overview?
+                data: {levelId: 0, gameTime: 15} // TODO proper id via overview?
+            },
+            {
+                key: SCENES.INFOMENU,
+                data: {contentKey: CONTENT.FIRST_TIME_MIDDLE, buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.GAMEOVER,
-                data: {content: "You did great - for your first time!", buttonText: "Back to Menu"}
+                data: {contentKey: CONTENT.FIRST_TIME_GAMEOVER, buttonText: "Back to Menu!"}
             },
             {
                 key: SCENES.MAINMENU,
                 data: {}
             }
         ]
+    }
+
+    private generateButtonText() {
+        var texts = ["Let's go!", "Next!", "Continue", "Let's see!", "Hussar!", "Hurray!", "Go! Go!"];
+        var randomInt = constUtils.getRandomInt(texts.length);
+        return texts[randomInt];
     }
 }

@@ -1,35 +1,48 @@
 import {SCENES} from "../constants/scenes.ts";
 import {REGISTRY} from "../constants/registry.ts";
 import {URLS} from "../constants/urls.ts";
+import {TextField} from "../containers/TextField.ts";
+import {Button} from "../containers/Button.ts";
 
 export class GameOverScene extends Phaser.Scene {
     levelId: number;
+    contentKey: string;
+    buttonText: string;
 
     constructor() {
         super({
             key: SCENES.GAMEOVER, active: false
         });
-        this.levelId = 61;
+        this.levelId = 0;
+        this.contentKey = "Hurr Durr!?";
+        this.buttonText = "Durr!";
+
     }
 
     init(data: any) {
-        // TODO: USE NONE STATIC LEVELID
-        //this.levelId = data.levelId;
+        this.levelId = data.levelId;
+        this.contentKey = data.contentKey;
+        this.buttonText = data.buttonText;
     }
 
+    preload() {
+        this.load.setPath('assets/content');
+        // @ts-ignore
+        this.load.text(this.contentKey, this.contentKey);
+    }
 
     create(){
-        let { width, height } = this.sys.game.canvas;
-
-        this.add.text(width / 2, height / 10, "Game Over!")
-            .setScale(5)
-            .setColor('#FFFFFF');
-
-        this.add.text(width / 2, height / 2, "Points: " + this.registry.get(REGISTRY.SCORE).toString())
-            .setScale(5)
-            .setColor('#FFFFFF');
-
         this.publishData();
+
+        var content = this.cache.text.get(this.contentKey);
+
+        new TextField(this, 2, "Game Over", 3);
+
+        new TextField(this, 4, content);
+
+        new TextField(this, 6, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 4);
+
+        new Button(this, 8, this.buttonText);
     }
 
     private publishData() {

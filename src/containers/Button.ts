@@ -2,6 +2,7 @@ import {IMAGE} from "../constants/image.ts";
 import {SCENES} from "../constants/scenes.ts";
 import {SceneFlowManager} from "../scenes/SceneFlowManager.ts";
 import {FLOW} from "../constants/flow.ts";
+import {PlayScene} from "../scenes/PlayScene.ts";
 
 export class Button extends Phaser.GameObjects.Container {
     name!: string;
@@ -72,7 +73,14 @@ export class Button extends Phaser.GameObjects.Container {
 
             if (nextScene == undefined) {
                 //this.scene.scene.add(this.nextSceneKey, PlayScene, false, );
-                console.error("Scene is undefined - shit hit the fan");
+
+                if (key == SCENES.PLAY) {
+                    var scene = new PlayScene();
+                    this.scene.scene.add(key, scene, true);
+                } else {
+                    console.error("Scene is undefined - shit hit the fan");
+                }
+
             }
 
             this.scene.scene.start(key, data);
