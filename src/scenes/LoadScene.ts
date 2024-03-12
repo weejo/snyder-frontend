@@ -80,6 +80,8 @@ export class LoadScene extends Phaser.Scene {
         //  this.scene.launch(SCENES.FLOWMANAGER);
         var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
 
+        flowmanager.generateLevelFlows();
+
         const {key, data} = flowmanager.getNextScene();
 
         this.scene.start(key, data);

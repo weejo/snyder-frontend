@@ -6,7 +6,7 @@ import {Button} from "../containers/Button.ts";
 
 export class GameOverScene extends Phaser.Scene {
     levelId: number;
-    contentKey: string;
+    content: string;
     buttonText: string;
 
     constructor() {
@@ -14,33 +14,30 @@ export class GameOverScene extends Phaser.Scene {
             key: SCENES.GAMEOVER, active: false
         });
         this.levelId = 0;
-        this.contentKey = "Hurr Durr!?";
+        this.content = "Hurr Durr!?";
         this.buttonText = "Durr!";
 
     }
 
     init(data: any) {
         this.levelId = data.levelId;
-        this.contentKey = data.contentKey;
+        this.content = data.content;
         this.buttonText = data.buttonText;
     }
 
-    preload() {
-        this.load.setPath('assets/content');
-        // @ts-ignore
-        this.load.text(this.contentKey, this.contentKey);
-    }
-
     create(){
+        if (!this.scene.isActive(SCENES.MENUBACKGROUND)) {
+            this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
+        }
         this.publishData();
 
-        var content = this.cache.text.get(this.contentKey);
+
 
         new TextField(this, 2, "Game Over", 3);
 
-        new TextField(this, 4, content);
+        new TextField(this, 4, this.content);
 
-        new TextField(this, 6, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 4);
+        new TextField(this, 6, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 3);
 
         new Button(this, 8, this.buttonText);
     }

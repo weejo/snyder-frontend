@@ -1,5 +1,9 @@
 /node_modules/**
 /.cache/**
-/dist/
+/dist/index.html
+/dist/index.js
+/dist/main.*
+/dist/phaser.*
+/dist/stylesheet.*
 /.idea/**
 /.parcel-cache/**

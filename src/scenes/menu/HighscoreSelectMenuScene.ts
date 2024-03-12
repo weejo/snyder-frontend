@@ -3,12 +3,13 @@ import {SCENES} from "../../constants/scenes.ts";
 import {Button} from "../../containers/Button.ts";
 import {TextField} from "../../containers/TextField.ts";
 
-export class LevelSelectMenuScene extends Phaser.Scene {
+export class HighscoreSelectMenuScene extends Phaser.Scene {
     buttonText: string;
+
 
     constructor() {
         super({
-            key: SCENES.LEVELSELECT, active: false
+            key: SCENES.HIGHSCORESELECT, active: false
         })
         this.buttonText = "Durr!";
     }
@@ -18,7 +19,7 @@ export class LevelSelectMenuScene extends Phaser.Scene {
     }
 
     create() {
-        new TextField(this, 2, "Level Select", 3);
+        new TextField(this, 2, "HighScore Select", 3);
 
         var levelOverviewData = this.registry.get(REGISTRY.OVERVIEW);
 

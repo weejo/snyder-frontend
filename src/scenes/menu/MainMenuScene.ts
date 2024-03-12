@@ -42,10 +42,10 @@ export class MainMenuScene extends Phaser.Scene {
                 .setScale(2.5, 2.5)
                 .setColor('#ffffff');
             new Button(this, 3, " Survey  ", FLOW.SURVEY);
-            new Button(this, 4, "Free Play", FLOW.NORMALGAME);
+            new Button(this, 4, "Free Play", FLOW.LEVELSELECT);
         }
 
-        new Button(this, 5, "Highscore", FLOW.HIGHSCORE);
+        new Button(this, 5, "Highscore", FLOW.HIGHSCORESELECT);
         new Button(this, 6, "  About  ", FLOW.ABOUT);
     }
 }

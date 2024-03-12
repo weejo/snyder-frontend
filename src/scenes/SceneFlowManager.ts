@@ -3,13 +3,14 @@ import {CONTENT} from "../constants/content.ts";
 import {FLOW} from "../constants/flow.ts";
 import {LOCALSTORAGE} from "../constants/localstorage.ts";
 import {constUtils} from "../utils/constUtils.ts";
+import {REGISTRY} from "../constants/registry.ts";
 
 export class SceneFlowManager extends Phaser.Scene {
 
     flowMap: Map<any, any>;
     position: number;
     currentFlow: string;
-
+    overviewData: any;
 
     constructor() {
         super({
@@ -22,11 +23,6 @@ export class SceneFlowManager extends Phaser.Scene {
 
     create() {
         localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "1");
-
-
-        this.flowMap.set(FLOW.STARTUP, this.addStartupFlow());
-        this.flowMap.set(FLOW.FIRSTGAME, this.addFirstGameFlow());
-
     }
 
     public getNextScene(newFLOW: string = FLOW.NOFLOW) {
@@ -44,12 +40,11 @@ export class SceneFlowManager extends Phaser.Scene {
 
         if (flow.key == SCENES.MAINMENU) {
             this.position = 0;
-            this.currentFlow = FLOW.NOFLOW;
             if (this.currentFlow == FLOW.FIRSTGAME) {
                 localStorage.setItem(LOCALSTORAGE.FIRST_PLAY, "0");
             }
+            this.currentFlow = FLOW.NOFLOW;
         }
-        
 
         return {
             key: flow.key,
@@ -75,6 +70,13 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     private addFirstGameFlow() {
+        var levelId = 0;
+        for (let data of this.overviewData) {
+            if (data.name == "umap_iris") {
+                levelId = data.levelId;
+            }
+        }
+
         return [
             {
                 key: SCENES.INFOMENU,
@@ -82,15 +84,19 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: 0, gameTime: 15} // TODO proper id via overview?
+                data: {levelId: levelId, gameTime: 15}
             },
             {
                 key: SCENES.INFOMENU,
                 data: {contentKey: CONTENT.FIRST_TIME_MIDDLE, buttonText: this.generateButtonText()}
             },
             {
+                key: SCENES.PLAY,
+                data: {levelId: levelId, gameTime: 60}
+            },
+            {
                 key: SCENES.GAMEOVER,
-                data: {contentKey: CONTENT.FIRST_TIME_GAMEOVER, buttonText: "Back to Menu!"}
+                data: {content: this.generateGameOverMessage(), buttonText: "Back to the Menu!"}
             },
             {
                 key: SCENES.MAINMENU,
@@ -100,8 +106,99 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     private generateButtonText() {
-        var texts = ["Let's go!", "Next!", "Continue", "Let's see!", "Hussar!", "Hurray!", "Go! Go!"];
+        var texts = ["Let's go!", "Next!", "Continue", "Let's see!", "Hussar!", "Hurray!", "Go! Go!", "NEXT!", "NEEEEXT!", "Up! Up and away!"];
         var randomInt = constUtils.getRandomInt(texts.length);
         return texts[randomInt];
+    }
+
+    private generateGameOverMessage() {
+
+        var texts = [
+            "Houston, we had a problem!",
+            "Looks like you spaced out!",
+            "You did great, or something like that...",
+            "Your diary's final entry: 'Should've taken that left turn'",
+            "In space, no one can hear you scream... but they definitely saw that crash.",
+            "Warning: Sudden stops can be harmful to your body's structural integrity!",
+            "Achievement Unlocked: Galactic Pancake. Try not to flatten your ship next time.",
+            "You've boldly gone where many have gone before... the game-over screen.",
+            "Pro Tip: Spacecraft are not designed for head-on introductions to obstacles.",
+            "Remember, space is vast, but it's not always empty. Watch out for that... Oh, too late.",
+            "It's not a bug, it's a feature: Instant spaceship recycling!"
+        ];
+        var randomInt = constUtils.getRandomInt(texts.length);
+        return texts[randomInt];
+    }
+
+    private addLevelSelectFlow() {
+        return [
+            {
+                key: SCENES.LEVELSELECT,
+                data: {buttonText: "Back to the Menu!"}
+            },
+            {
+                key: SCENES.MAINMENU,
+                data: {}
+            }
+        ]
+    }
+
+    private addHighscoreSelectFlow() {
+        return [
+            {
+                key: SCENES.HIGHSCORE,
+                data: {buttonText: "Back to the Menu!"}
+            },
+            {
+                key: SCENES.MAINMENU,
+                data: {}
+            }
+        ]
+    }
+
+    private addSurveyGameFlow() {
+        return [
+            { //TODO ADD PROPER SURVEY QUESTION SCENE AND MAKE SURVEY TEXTS etc...
+                key: SCENES.MAINMENU,
+                data: {}
+            }
+        ]
+
+    }
+
+
+    generateLevelFlows() {
+        this.overviewData = this.registry.get(REGISTRY.OVERVIEW);
+
+        this.flowMap.set(FLOW.FIRSTGAME, this.addFirstGameFlow());
+        this.flowMap.set(FLOW.STARTUP, this.addStartupFlow());
+        this.flowMap.set(FLOW.LEVELSELECT, this.addLevelSelectFlow());
+        this.flowMap.set(FLOW.HIGHSCORESELECT, this.addHighscoreSelectFlow());
+        this.flowMap.set(FLOW.SURVEY, this.addSurveyGameFlow());
+
+        this.overviewData.forEach((levelData: { name: string; levelId: number }) => {
+            this.flowMap.set(levelData.name, this.addLevelFlow(levelData))
+        });
+    }
+
+    private addLevelFlow(levelData: {name: string; levelId: number}) {
+        return [
+            {
+                key: SCENES.PLAY,
+                data: {levelId: levelData.levelId, gameTime: 60}
+            },
+            {
+                key: SCENES.GAMEOVER,
+                data: {content: this.generateGameOverMessage(), buttonText: this.generateButtonText()}
+            },
+            {
+                key: SCENES.HIGHSCORE,
+                data: {levelData: levelData, buttonText: this.generateButtonText()}
+            },
+            {
+                key: SCENES.MAINMENU,
+                data: {}
+            }
+        ]
     }
 }
