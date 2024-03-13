@@ -134,13 +134,9 @@ export class TrackingScene extends Phaser.Scene {
 
     private updateScore(average: number) {
         if (average <= 0) return;
-        var score = this.registry.get(REGISTRY.SCORE);
-        if (isNaN(score)) {
-            score = 0;
-        }
+        let score = parseInt(this.registry.get(REGISTRY.SCORE));
         score += average * CONFIG.SCORESCALE;
-        score = score.toFixed(2);
-        this.registry.set(REGISTRY.SCORE, score);
+        this.registry.set(REGISTRY.SCORE, score.toFixed(2));
         eventUtils.emit(EVENTS.SCORECHANGE);
     }
 
@@ -209,7 +205,7 @@ export class TrackingScene extends Phaser.Scene {
 
     private cleanUp() {
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
-        this.path = new Set();
+        this.path = new Set(); // TODO don't reset path, remove only that part that is in the circle.
         this.currentPolygonContent = [];
         for (let pathLight of this.pathLights) {
             pathLight.destroy(true);

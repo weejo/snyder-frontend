@@ -1,0 +1,4 @@
+export const CACHE = {
+    HIGHSCORE: "HIGHSCORE",
+    OVERVIEW: "OVERVIEW"
+}

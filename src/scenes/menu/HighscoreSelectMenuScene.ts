@@ -28,7 +28,7 @@ export class HighscoreSelectMenuScene extends Phaser.Scene {
         levelOverviewData.forEach((levelData: { name: string; size: string; }) => {
             var content = "level: " + levelData.name + "; size: " + levelData.size;
 
-            new Button(this, counter, content, levelData.name);
+            new Button(this, counter, content, levelData.name + "_HIGHSCORE");
 
             counter++;
         });

@@ -4,6 +4,7 @@ import {TILESET} from "../constants/tilesets.ts";
 import {URLS} from "../constants/urls.ts";
 import {REGISTRY} from "../constants/registry.ts";
 import {SceneFlowManager} from "./SceneFlowManager.ts";
+import {CACHE} from "../constants/cache.ts";
 
 
 export class LoadScene extends Phaser.Scene {
@@ -55,7 +56,7 @@ export class LoadScene extends Phaser.Scene {
             loadingBar.fillRect(0, this.game.renderer.height / 2, this.game.renderer.width * percent, 50);
         })
 
-        this.load.json('overviewData', URLS.OVERVIEW);
+        this.load.json(CACHE.OVERVIEW, URLS.OVERVIEW);
 
         //load images, spritesheet, sounds
         this.loadImages();
@@ -71,7 +72,7 @@ export class LoadScene extends Phaser.Scene {
     }
 
     create() {
-        var overviewData = JSON.parse(JSON.stringify(this.cache.json.get('overviewData')));
+        var overviewData = JSON.parse(JSON.stringify(this.cache.json.get(CACHE.OVERVIEW)));
         this.registry.set(REGISTRY.OVERVIEW, overviewData.overviewLevels);
 
 

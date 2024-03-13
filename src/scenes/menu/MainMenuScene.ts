@@ -37,7 +37,8 @@ export class MainMenuScene extends Phaser.Scene {
             new Button(this, 4, "Free Play", FLOW.FIRSTGAME);
         } else {
             if (localStorage.getItem(LOCALSTORAGE.ASKFORSURVEY) == null) {
-                new TextField(this, 1,"Welcome back " + username + "!\nNow that you know the game, please start the survey!");
+                new TextField(this, 1,"Welcome back " + username+ "!");
+                new TextField(this, 2,"Now that you know the game, please start the survey!");
                 localStorage.setItem(LOCALSTORAGE.ASKFORSURVEY, "HURZ");
             } else {
                 new TextField(this, 1,"Welcome back " + username+ "!");

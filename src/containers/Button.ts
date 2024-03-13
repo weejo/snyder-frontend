@@ -3,6 +3,8 @@ import {SCENES} from "../constants/scenes.ts";
 import {SceneFlowManager} from "../scenes/SceneFlowManager.ts";
 import {FLOW} from "../constants/flow.ts";
 import {PlayScene} from "../scenes/PlayScene.ts";
+import {HighscoreScene} from "../scenes/menu/HighscoreScene.ts";
+import {CACHE} from "../constants/cache.ts";
 
 export class Button extends Phaser.GameObjects.Container {
     name!: string;
@@ -73,20 +75,26 @@ export class Button extends Phaser.GameObjects.Container {
 
             if (nextScene == undefined) {
                 //this.scene.scene.add(this.nextSceneKey, PlayScene, false, );
-
                 if (key == SCENES.PLAY) {
-                    var scene = new PlayScene();
-                    this.scene.scene.add(key, scene, true);
+                    var playScene = new PlayScene();
+                    this.scene.scene.add(key, playScene, true);
+                } else if (key == SCENES.HIGHSCORE) {
+                   var highscoreScene = new HighscoreScene();
+                   this.scene.scene.add(key, highscoreScene, true);
                 } else {
                     console.error("Scene is undefined - shit hit the fan");
                 }
-
             }
 
             this.scene.scene.start(key, data);
 
             if (key == SCENES.PLAY) {
                 this.scene.scene.stop(SCENES.MENUBACKGROUND);
+            }
+            //if you are leaving a Highscore scene - stop it.
+            if (this.scene.scene.key == SCENES.HIGHSCORE) {
+                this.scene.scene.stop();
+                this.scene.cache.json.remove(CACHE.HIGHSCORE);
             }
         })
 

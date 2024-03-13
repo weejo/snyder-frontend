@@ -113,7 +113,7 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.GAMEOVER,
-                data: {content: this.generateGameOverMessage(), buttonText: "Back to the Menu!", levelData: levelData}
+                data: {buttonText: this.generateButtonText(), levelData: levelData}
             },
             {
                 key: SCENES.MAINMENU,
@@ -123,26 +123,7 @@ export class SceneFlowManager extends Phaser.Scene {
     }
 
     private generateButtonText() {
-        var texts = ["Let's go!", "Next!", "Continue", "Let's see!", "Hussar!", "Hurray!", "Go! Go!", "NEXT!", "NEEEEXT!", "Up! Up and away!"];
-        var randomInt = constUtils.getRandomInt(texts.length);
-        return texts[randomInt];
-    }
-
-    private generateGameOverMessage() {
-
-        var texts = [
-            "Houston, we had a problem!",
-            "Looks like you spaced out!",
-            "You did great, or something like that...",
-            "Your diary's final entry:\n'Should've taken that left turn'",
-            "In space, no one can hear you scream...\nbut they definitely saw that crash.",
-            "Warning:\nSudden stops can be harmful to your body's structural integrity!",
-            "Achievement Unlocked: \nGalactic Pancake. Try not to flatten your ship next time.",
-            "You've boldly gone where many have gone before...\nthe game-over screen.",
-            "Pro Tip:\nSpacecraft are not designed for head-on introductions to obstacles.",
-            "Remember, space is vast, but it's not always empty.\nWatch out for that... Oh, too late.",
-            "It's not a bug, it's a feature:\nInstant spaceship recycling!"
-        ];
+        var texts = ["Let's go!", "Next!", "Continue", "Hussar!", "Hurray!", "Go! Go!", "NEXT!", "NEEEEXT!", "Up! Up and away!"];
         var randomInt = constUtils.getRandomInt(texts.length);
         return texts[randomInt];
     }
@@ -151,7 +132,7 @@ export class SceneFlowManager extends Phaser.Scene {
         return [
             {
                 key: SCENES.LEVELSELECT,
-                data: {buttonText: "Back to the Menu!"}
+                data: {buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.MAINMENU,
@@ -163,8 +144,8 @@ export class SceneFlowManager extends Phaser.Scene {
     private addHighscoreSelectFlow() {
         return [
             {
-                key: SCENES.HIGHSCORE,
-                data: {buttonText: "Back to the Menu!"}
+                key: SCENES.HIGHSCORESELECT,
+                data: {buttonText: this.generateButtonText()}
             },
             {
                 key: SCENES.MAINMENU,
@@ -195,6 +176,7 @@ export class SceneFlowManager extends Phaser.Scene {
 
         this.overviewData.forEach((levelData: { name: string; levelId: number }) => {
             this.flowMap.set(levelData.name, this.addLevelFlow(levelData))
+            this.flowMap.set(levelData.name + "_HIGHSCORE", this.addHighscoreFlow(levelData));
         });
     }
 
@@ -206,8 +188,20 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.GAMEOVER,
-                data: {content: this.generateGameOverMessage(), buttonText: this.generateButtonText(), levelData: levelData}
+                data: {buttonText: this.generateButtonText(), levelData: levelData}
             },
+            {
+                key: SCENES.HIGHSCORE,
+                data: {levelData: levelData, buttonText: this.generateButtonText()}
+            },
+            {
+                key: SCENES.MAINMENU,
+                data: {}
+            }
+        ]
+    }
+    private addHighscoreFlow(levelData: {name: string; levelId: number}) {
+        return [
             {
                 key: SCENES.HIGHSCORE,
                 data: {levelData: levelData, buttonText: this.generateButtonText()}
