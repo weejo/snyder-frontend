@@ -23,7 +23,7 @@ export class QUESTION2 extends Phaser.Scene {
         });
         this.buttonText = "";
 
-        this.data = {answer1: "", answer2: ""};
+        this.data = {answer1: "", answer2: "", answer3:""};
 
         this.question1_event = EVENTS.QUESTION1;
         this.question2_event = EVENTS.QUESTION2;
