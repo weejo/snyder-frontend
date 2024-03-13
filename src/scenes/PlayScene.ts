@@ -5,6 +5,8 @@ import {REGISTRY} from "../constants/registry.ts";
 import {IMAGE} from "../constants/image.ts";
 import {TILESET} from "../constants/tilesets.ts";
 import {SceneFlowManager} from "./SceneFlowManager.ts";
+import {LOCALSTORAGE} from "../constants/localstorage.ts";
+import {URLS} from "../constants/urls.ts";
 
 export class PlayScene extends Phaser.Scene {
 
@@ -14,33 +16,43 @@ export class PlayScene extends Phaser.Scene {
     map: any;
     tileset: any;
     gameStarted: boolean;
-    blackDeathToggle: boolean;
     levelId: number;
     gameTime: number;
 
+    publishToggle: boolean;
+    blackDeathToggle: boolean;
+    asteroidsToggle: boolean;
 
     constructor() {
         super({
             key: SCENES.PLAY, active: false
         });
         this.gameStarted = false;
-        this.blackDeathToggle = false;
+        this.blackDeathToggle = true;
         this.levelId = 0;
         this.gameTime = 60;
+        this.publishToggle = true;
+        this.asteroidsToggle = false;
     }
 
-    init(data: { levelId: number, gameTime: number | null }) {
+    init(data: { levelId: number, gameTime: number | null, publishToggle: boolean | null, blackDeathToggle: boolean | null, asteroidsToggle: boolean | null}) {
         this.levelId = data.levelId;
         if(data.gameTime != null) {
             this.gameTime = data.gameTime;
         }
-
+        if (data.publishToggle != null) {
+            this.publishToggle = data.publishToggle;
+        }
+        if (data.blackDeathToggle != null) {
+            this.blackDeathToggle = data.blackDeathToggle;
+        }
+        if (data.asteroidsToggle != null) {
+            this.asteroidsToggle = data.asteroidsToggle;
+        }
     }
 
     preload() {
-        //this.load.tilemapTiledJSON('tilemap', "http://localhost:8080/level?levelId=" + this.levelId );
-
-        this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
+        this.load.tilemapTiledJSON('tilemap', URLS.LEVELDATA + this.levelId);
     }
 
     create() {
@@ -67,7 +79,7 @@ export class PlayScene extends Phaser.Scene {
 
     private setupScenes() {
         this.scene.launch(SCENES.HUD, {gameTime: this.gameTime});
-        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map});
+        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map, blackDeathToggle: this.blackDeathToggle});
     }
 
     private setupPlayer() {
@@ -82,15 +94,22 @@ export class PlayScene extends Phaser.Scene {
             blendMode: 'ADD',
 
         });
+
         this.player = this.physics.add.image(100, 100, IMAGE.SHIP);
 
         this.emitter.startFollow(this.player);
 
 
         // movement stuff
-        this.player.setDrag(300);
-        this.player.setAngularDrag(400);
-        this.player.setMaxVelocity(600);
+        if (this.asteroidsToggle) {
+            this.player.setDamping(true);
+            this.player.setDrag(0.99);
+            this.player.setMaxVelocity(800);
+        } else {
+            this.player.setDrag(300);
+            this.player.setAngularDrag(400);
+            this.player.setMaxVelocity(600);
+        }
 
         this.physics.world.setBounds(0,0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
 
@@ -157,11 +176,38 @@ export class PlayScene extends Phaser.Scene {
         if (nextScene == undefined) {
             console.error("Scene is undefined - shit hit the fan");
         }
+
         this.scene.stop(SCENES.TRACKING);
         this.scene.stop(SCENES.HUD);
         this.scene.stop(SCENES.PLAY);
+
+        if(this.publishToggle) {
+            this.publishData();
+        }
+
         this.scene.start(key, data);
         }
+    }
+
+
+    private publishData() {
+        var entry = {
+            points: parseInt(this.registry.get(REGISTRY.SCORE)),
+            name: localStorage.getItem(LOCALSTORAGE.USERNAME)
+        }
+
+        fetch(URLS.ADDRESULT, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "entry": entry,
+                "levelId": this.levelId,
+                "data": this.registry.get(REGISTRY.CLUSTER)
+            })
+        }).then();
     }
 
     private setupDebugInput(help: Phaser.GameObjects.Text) {

@@ -1,33 +1,27 @@
 import {SCENES} from "../constants/scenes.ts";
 import {REGISTRY} from "../constants/registry.ts";
-import {URLS} from "../constants/urls.ts";
 import {TextField} from "../containers/TextField.ts";
 import {Button} from "../containers/Button.ts";
-import {LOCALSTORAGE} from "../constants/localstorage.ts";
 import {constUtils} from "../utils/constUtils.ts";
 
 export class GameOverScene extends Phaser.Scene {
-    levelId: number;
     buttonText: string;
 
     constructor() {
         super({
             key: SCENES.GAMEOVER, active: false
         });
-        this.levelId = 0;
         this.buttonText = "Durr!";
     }
 
     init(data: any) {
-        this.levelId = data.levelData.levelId;
         this.buttonText = data.buttonText;
     }
 
-    create(){
+    create() {
         if (!this.scene.isActive(SCENES.MENUBACKGROUND)) {
             this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
         }
-        this.publishData();
 
         new TextField(this, 2, "Game Over", 3);
 
@@ -37,27 +31,6 @@ export class GameOverScene extends Phaser.Scene {
 
         new Button(this, 8, this.buttonText);
     }
-
-    private publishData() {
-        var entry = {
-            points: parseInt(this.registry.get(REGISTRY.SCORE)),
-            name: localStorage.getItem(LOCALSTORAGE.USERNAME)
-        }
-
-        fetch(URLS.ADDRESULT, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "entry": entry,
-                "levelId": this.levelId,
-                "data": this.registry.get(REGISTRY.CLUSTER)
-            })
-        }).then();
-    }
-
 
     private generateGameOverMessage() {
 

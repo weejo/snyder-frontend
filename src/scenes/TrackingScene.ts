@@ -31,13 +31,14 @@ export class TrackingScene extends Phaser.Scene {
         this.bIsGameRunning = false;
         this.currentPolygon = [];
         this.currentPolygonContent = [];
-        this.blackDeathToggle = false;
+        this.blackDeathToggle = true;
         this.isOnRecentlyCleanedPath = false;
     }
 
     init(data: any) {
         this.player = data.player;
         this.map = data.map;
+        this.blackDeathToggle = data.blackDeathToggle;
     }
 
     create() {
@@ -75,8 +76,10 @@ export class TrackingScene extends Phaser.Scene {
 
         if (tile.tint == 0 && this.lastTile != tile) {
             if (!this.isOnRecentlyCleanedPath) {
-                eventUtils.emit(EVENTS.GAMEOVER);
-                return true;
+                if (this.blackDeathToggle) {
+                    eventUtils.emit(EVENTS.GAMEOVER);
+                    return true;
+                }
             }
         }
 

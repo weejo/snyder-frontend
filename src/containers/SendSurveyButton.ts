@@ -4,9 +4,9 @@ import {SceneFlowManager} from "../scenes/SceneFlowManager.ts";
 import {FLOW} from "../constants/flow.ts";
 import {PlayScene} from "../scenes/PlayScene.ts";
 import {HighscoreScene} from "../scenes/menu/HighscoreScene.ts";
-import {CACHE} from "../constants/cache.ts";
+import {URLS} from "../constants/urls.ts";
 
-export class Button extends Phaser.GameObjects.Container {
+export class SendSurveyButton extends Phaser.GameObjects.Container {
     name!: string;
     x!: number;
     y!: number;
@@ -16,17 +16,20 @@ export class Button extends Phaser.GameObjects.Container {
     content!: string;
     scale: number;
     flow: string;
+    surveyId: number;
+    data: any;
 
-    constructor(scene: Phaser.Scene, lineNumber: number, content: string, flow: string = FLOW.NOFLOW, scale: number = 2) {
+    constructor(scene: Phaser.Scene, lineNumber: number, content: string, data: any, surveyId: number, flow: string = FLOW.NOFLOW, scale: number = 2) {
         super(scene, undefined);
         let {width, height} = this.scene.sys.game.canvas;
 
-        this.y = (height /10) * lineNumber;
+        this.y = (height / 10) * lineNumber;
         this.scene = scene;
         this.content = content;
         this.x = (width / 2);
         this.scale = scale;
         this.flow = flow;
+        this.surveyId = 0;
 
         // scale * 16 => default scale is 1.5, to make the renderwidth fit we go for *16, otherwise not all of the scaled up text would be displayed.
         this.renderWidth = content.length * (scale * 16);
@@ -78,28 +81,40 @@ export class Button extends Phaser.GameObjects.Container {
                     var playScene = new PlayScene();
                     this.scene.scene.add(key, playScene, true);
                 } else if (key == SCENES.HIGHSCORE) {
-                   var highscoreScene = new HighscoreScene();
-                   this.scene.scene.add(key, highscoreScene, true);
+                    var highscoreScene = new HighscoreScene();
+                    this.scene.scene.add(key, highscoreScene, true);
                 } else {
                     console.error("Scene is undefined - shit hit the fan");
                 }
             }
+            this.publishData();
 
             this.scene.scene.start(key, data);
 
             if (key == SCENES.PLAY) {
                 this.scene.scene.stop(SCENES.MENUBACKGROUND);
             }
-            //if you are leaving a Highscore scene - stop it.
-            if (this.scene.scene.key == SCENES.HIGHSCORE) {
-                this.scene.scene.stop();
-                this.scene.cache.json.remove(CACHE.HIGHSCORE);
-            }
+
         })
 
         this.scene.add.text(this.x, this.y, this.content, {fontFamily: 'atari'})
             .setScale(this.scale)
             .setColor('#ffffff')
             .setOrigin(0.5);
+    }
+
+    private publishData() {
+
+        fetch(URLS.SURVEY, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "surveyId": this.surveyId,
+                "data": this.data
+            })
+        }).then();
     }
 }
