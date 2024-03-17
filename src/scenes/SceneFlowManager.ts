@@ -88,7 +88,7 @@ export class SceneFlowManager extends Phaser.Scene {
     private addFirstGameFlow() {
         var levelData;
         for (let data of this.overviewData) {
-            if (data.name == "umap_iris") {
+            if (data.name == "Three Islands") {
                 levelData = data;
                 break;
             }
@@ -154,80 +154,6 @@ export class SceneFlowManager extends Phaser.Scene {
         ]
     }
 
-    private addSurveyGameFlow() {
-        var levelData;
-        var otherData;
-        for (let data of this.overviewData) {
-            if (data.name == "umap_iris") {
-                levelData = data;
-            }
-            if (data.name == "umap_blob") {
-                otherData = data;
-            }
-        }
-
-
-        return [
-            {
-                key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.STAGE_1, buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: true}
-            },
-            {
-                key: SCENES.QUESTION1,
-                data: {buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.STAGE_2, buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: true, asteroidsToggle: true}
-            },
-            {
-                key: SCENES.QUESTION2,
-                data: {buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.STAGE_3, buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: true, blackDeathToggle: false}
-            },
-            {
-                key: SCENES.QUESTION3,
-                data: {buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.STAGE_4, buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: false, blackDeathToggle: false, asteroidsToggle: true}
-            },
-            {
-                key: SCENES.QUESTION4,
-                data: {buttonText: this.generateButtonText()}
-            },
-            {
-                key: SCENES.INFOMENU,
-                data: {contentKey: CONTENT.STAGE_END, buttonText: "Thank you for helping!"}
-            },
-            {
-                key: SCENES.MAINMENU,
-                data: {}
-            }
-        ]
-
-    }
-
 
     generateLevelFlows() {
         this.overviewData = this.registry.get(REGISTRY.OVERVIEW);
@@ -236,7 +162,6 @@ export class SceneFlowManager extends Phaser.Scene {
         this.flowMap.set(FLOW.STARTUP, this.addStartupFlow());
         this.flowMap.set(FLOW.LEVELSELECT, this.addLevelSelectFlow());
         this.flowMap.set(FLOW.HIGHSCORESELECT, this.addHighscoreSelectFlow());
-        this.flowMap.set(FLOW.SURVEY, this.addSurveyGameFlow());
 
         this.overviewData.forEach((levelData: { name: string; levelId: number }) => {
             this.flowMap.set(levelData.name, this.addLevelFlow(levelData))
@@ -248,7 +173,7 @@ export class SceneFlowManager extends Phaser.Scene {
         return [
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60}
+                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: true}
             },
             {
                 key: SCENES.GAMEOVER,

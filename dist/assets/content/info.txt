@@ -4,8 +4,6 @@ This is a master's thesis project.
 The following data will be collected:
 
 
-* Your answers to questions
-
 * The path you moved while in-game
 
 * The score you achieved

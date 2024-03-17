@@ -7,6 +7,8 @@ import {TILESET} from "../constants/tilesets.ts";
 import {SceneFlowManager} from "./SceneFlowManager.ts";
 import {LOCALSTORAGE} from "../constants/localstorage.ts";
 import {URLS} from "../constants/urls.ts";
+import {GameOverScene} from "./GameOverScene.ts";
+import {TrackingScene} from "./TrackingScene.ts";
 
 export class PlayScene extends Phaser.Scene {
 
@@ -18,6 +20,8 @@ export class PlayScene extends Phaser.Scene {
     gameStarted: boolean;
     levelId: number;
     gameTime: number;
+    inputData: {countUp: number, timeUp: number, timeLeft: number, countLeft: number, timeRight: number, countRight: number, timeSpace: number, countSpace: number};
+    inputToggles: {up: boolean, left: boolean, right: boolean, space: boolean}
 
     publishToggle: boolean;
     blackDeathToggle: boolean;
@@ -28,16 +32,24 @@ export class PlayScene extends Phaser.Scene {
             key: SCENES.PLAY, active: false
         });
         this.gameStarted = false;
-        this.blackDeathToggle = true;
+        this.blackDeathToggle = false;
         this.levelId = 0;
         this.gameTime = 60;
         this.publishToggle = true;
         this.asteroidsToggle = false;
+        this.inputData = {countUp: 0, timeUp: 0, countSpace: 0, timeSpace: 0, countRight: 0, timeRight: 0, countLeft: 0, timeLeft: 0}
+        this.inputToggles = {up: false, left: false, right: false, space: false}
     }
 
-    init(data: { levelId: number, gameTime: number | null, publishToggle: boolean | null, blackDeathToggle: boolean | null, asteroidsToggle: boolean | null}) {
+    init(data: {
+        levelId: number,
+        gameTime: number | null,
+        publishToggle: boolean | null,
+        blackDeathToggle: boolean | null,
+        asteroidsToggle: boolean | null
+    }) {
         this.levelId = data.levelId;
-        if(data.gameTime != null) {
+        if (data.gameTime != null) {
             this.gameTime = data.gameTime;
         }
         if (data.publishToggle != null) {
@@ -52,7 +64,8 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.tilemapTiledJSON('tilemap', URLS.LEVELDATA + this.levelId);
+        //this.load.tilemapTiledJSON('tilemap', URLS.LEVELDATA + this.levelId);
+        this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
     }
 
     create() {
@@ -66,20 +79,26 @@ export class PlayScene extends Phaser.Scene {
         this.setupScenes();
 
         this.setupEventListeners();
-        var help = this.add.text(0, 0, '', { font: '48px monospace' });
+        var help = this.add.text(0, 0, '', {font: '48px monospace'});
 
         this.setupDebugInput(help);
     }
 
     private initializeRegistry() {
+        var array = new Array(this.map.width * this.map.height);
+        array.fill(0);
 
-        this.registry.set(REGISTRY.CLUSTER, new Array(this.map.width * this.map.height).fill(0));
+        this.registry.set(REGISTRY.CLUSTER, array);
         this.registry.set(REGISTRY.SCORE, 0);
     }
 
     private setupScenes() {
         this.scene.launch(SCENES.HUD, {gameTime: this.gameTime});
-        this.scene.launch(SCENES.TRACKING, {player: this.player, map: this.map, blackDeathToggle: this.blackDeathToggle});
+        this.scene.launch(SCENES.TRACKING, {
+            player: this.player,
+            map: this.map,
+            blackDeathToggle: this.blackDeathToggle
+        });
     }
 
     private setupPlayer() {
@@ -95,7 +114,7 @@ export class PlayScene extends Phaser.Scene {
 
         });
 
-        this.player = this.physics.add.image(100, 100, IMAGE.SHIP);
+        this.player = this.physics.add.image(400, 400, IMAGE.SHIP);
 
         this.emitter.startFollow(this.player);
 
@@ -111,7 +130,7 @@ export class PlayScene extends Phaser.Scene {
             this.player.setMaxVelocity(600);
         }
 
-        this.physics.world.setBounds(0,0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
+        this.physics.world.setBounds(0, 0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
 
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setZoom(0.5, 0.5);
@@ -122,7 +141,7 @@ export class PlayScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('backgroundtileset', TILESET.BASE);
 
-        this.map.createLayer('umap_iris', this.tileset, 0,0);
+        this.map.createLayer('base_layer', this.tileset, 0, 0);
     }
 
     private setupEventListeners() {
@@ -135,57 +154,95 @@ export class PlayScene extends Phaser.Scene {
             eventUtils.emit(EVENTS.GAMESTART, true);
         }
 
-        const { left, right, up } = this.cursors;
+        const {left, right, up, space} = this.cursors;
 
-        if (left.isDown)
-        {
+
+        if (left.isDown) {
+            this.inputToggles.right = false;
+
+            if (!this.inputToggles.left) {
+                this.inputData.countLeft +=1;
+                this.inputToggles.left = true;
+
+            } else {
+                this.inputData.timeLeft += delta;
+            }
+
             this.player.setAngularVelocity(-150);
-        }
-        else if (right.isDown)
-        {
+        } else if (right.isDown) {
+            this.inputToggles.left = false;
+
+            if(!this.inputToggles.right) {
+                this.inputData.countRight +=1;
+                this.inputToggles.right = true;
+            } else {
+                this.inputData.timeRight += delta;
+            }
+
             this.player.setAngularVelocity(150);
-        }
-        else
-        {
+        } else {
+            this.inputToggles.left = false;
+            this.inputToggles.right = false;
             this.player.setAngularVelocity(0);
         }
 
-        if (up.isDown)
-        {
-            this.emitter.start();
+        if (up.isDown) {
+            if (!this.inputToggles.up) {
+                this.inputData.countUp +=1;
+                this.inputToggles.up = true;
+            } else {
+                this.inputData.timeUp += delta;
+            }
             this.physics.velocityFromRotation(this.player.rotation, 600, this.player.body.acceleration);
-        }
-        else
-        {
+        } else {
+            this.inputToggles.up = false;
             this.player.setAcceleration(0);
-            this.emitter.stop();
+
         }
 
+        if (space.isDown) {
+            if (!this.inputToggles.space) {
+                this.inputData.countSpace += 1;
+                this.inputToggles.space = true;
+            } else {
+                this.inputData.timeSpace += delta;
+            }
+            this.emitter.start();
+            this.player.setMaxVelocity(1000);
+        } else {
+            this.inputToggles.space = false;
+            this.emitter.stop();
+            this.player.setMaxVelocity(600);
+        }
     }
 
     private gameOver() {
         if (this.gameStarted) {
             this.gameStarted = false;
 
-        var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
+            var flowmanager = this.scene.get(SCENES.FLOWMANAGER) as SceneFlowManager;
 
-        const {key, data} = flowmanager.getNextScene();
+            const {key, data} = flowmanager.getNextScene();
 
-        let nextScene = this.scene.get(key);
+            let nextScene = this.scene.get(key);
 
-        if (nextScene == undefined) {
-            console.error("Scene is undefined - shit hit the fan");
-        }
+            if (nextScene == undefined) {
+                if (key == SCENES.GAMEOVER) {
+                    var gameOverScene = new GameOverScene();
+                    this.scene.add(key, gameOverScene, true);
+                } else {
+                    console.error("Scene is undefined - shit hit the fan");
+                }
+            }
+            if (this.publishToggle) {
+                this.publishData();
+            }
 
-        this.scene.stop(SCENES.TRACKING);
-        this.scene.stop(SCENES.HUD);
-        this.scene.stop(SCENES.PLAY);
+            this.scene.start(key, data);
 
-        if(this.publishToggle) {
-            this.publishData();
-        }
-
-        this.scene.start(key, data);
+            this.scene.stop(SCENES.TRACKING);
+            this.scene.stop(SCENES.HUD);
+            this.scene.stop(SCENES.PLAY);
         }
     }
 
@@ -194,6 +251,11 @@ export class PlayScene extends Phaser.Scene {
         var entry = {
             points: parseInt(this.registry.get(REGISTRY.SCORE)),
             name: localStorage.getItem(LOCALSTORAGE.USERNAME)
+        }
+        var playerData = {
+            pathLength: (this.scene.get(SCENES.TRACKING) as TrackingScene).pathLength,
+            clusterData: this.registry.get(REGISTRY.CLUSTER),
+            inputData: this.inputData
         }
 
         fetch(URLS.ADDRESULT, {
@@ -204,8 +266,8 @@ export class PlayScene extends Phaser.Scene {
             },
             body: JSON.stringify({
                 "entry": entry,
+                "playerData": playerData,
                 "levelId": this.levelId,
-                "data": this.registry.get(REGISTRY.CLUSTER)
             })
         }).then();
     }
@@ -214,7 +276,7 @@ export class PlayScene extends Phaser.Scene {
         var layer = this.map;
 
         this.input.on('pointermove', function onPointerMove(pointer: any) {
-            var tile =  layer.getTileAtWorldXY(pointer.worldX, pointer.worldY, true);
+            var tile = layer.getTileAtWorldXY(pointer.worldX, pointer.worldY, true);
 
             if (!tile) return;
 

@@ -3,7 +3,7 @@
   "width": 266,
   "layers": [
     {
-      "name": "umap_iris",
+      "name": "base_layer",
       "data": [
         1,
         1,

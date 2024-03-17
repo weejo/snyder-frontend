@@ -4,5 +4,4 @@ export const IMAGE = {
     BRUSH: "brush.png",
     BLOCK: "block.png",
     BACKGROUND: "background.png"
-
 }

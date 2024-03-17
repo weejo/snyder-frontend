@@ -52,10 +52,6 @@ export class InfoMenuScene extends Phaser.Scene {
 
     create() {
         //create images (z order)
-        if (!this.scene.isActive(SCENES.MENUBACKGROUND)) {
-            this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
-        }
-
         this.content = this.cache.text.get(this.contentKey);
 
         new TextField(this, 4, this.content);

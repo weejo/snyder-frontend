@@ -1,9 +1,0 @@
-Rules for the next level:
-
-Default controls.
-
-Black fields will not kill you.
-
-But you have only 30 seconds time.
-
-Have fun!

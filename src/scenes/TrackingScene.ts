@@ -10,7 +10,6 @@ export class TrackingScene extends Phaser.Scene {
     player: any;
     lastTile?: Phaser.Tilemaps.Tile;
     path: Set<Phaser.Tilemaps.Tile>;
-    pathLights: Phaser.GameObjects.Sprite[];
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
     coordsOfRectangle: any;
@@ -19,13 +18,14 @@ export class TrackingScene extends Phaser.Scene {
     currentPolygonContent: Phaser.Tilemaps.Tile[];
     blackDeathToggle: boolean;
     isOnRecentlyCleanedPath: boolean;
+    hasVisitedNewTiles: boolean;
+    pathLength: number;
 
     constructor() {
         super({
             key: SCENES.TRACKING, active: true
         });
         this.path = new Set();
-        this.pathLights = [];
         this.lastTile = undefined;
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
@@ -33,6 +33,8 @@ export class TrackingScene extends Phaser.Scene {
         this.currentPolygonContent = [];
         this.blackDeathToggle = true;
         this.isOnRecentlyCleanedPath = false;
+        this.hasVisitedNewTiles = false;
+        this.pathLength = 0;
     }
 
     init(data: any) {
@@ -49,43 +51,21 @@ export class TrackingScene extends Phaser.Scene {
     update(time: number, delta: number) {
         if (this.bIsGameRunning) {
             var tile = this.map.getTileAtWorldXY(this.player.x, this.player.y);
-
-            if (this.checkIfGameIsOver(tile)) return;
-
-            tile = tile!;
-
-            if (this.lastTile != tile) {
-                if (this.path.contains(tile)) {
+            if (tile && this.lastTile != tile) {
+                if (this.hasVisitedNewTiles && this.path.contains(tile)) {
                     this.currentPolygon = this.extractPolygon(tile);
                     this.computePointsForGeneratedCluster();
                     this.updateVisitedTiles();
-                    this.cleanUp();
+                    this.cleanUp(tile);
                     this.isOnRecentlyCleanedPath = true;
+                    this.hasVisitedNewTiles = false;
                 } else {
+                    this.hasVisitedNewTiles = true;
                     this.extendPath(tile);
                 }
             }
         }
     }
-
-    private checkIfGameIsOver(tile: Phaser.Tilemaps.Tile | null): boolean {
-        if (tile == null) {
-            eventUtils.emit(EVENTS.GAMEOVER);
-            return true;
-        }
-
-        if (tile.tint == 0 && this.lastTile != tile) {
-            if (!this.isOnRecentlyCleanedPath) {
-                if (this.blackDeathToggle) {
-                    eventUtils.emit(EVENTS.GAMEOVER);
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
 
     /**
      * Remove all elements before the one that matches. We want the circle to begin and End at the same positon.
@@ -93,17 +73,8 @@ export class TrackingScene extends Phaser.Scene {
      * @private
      */
     private extractPolygon(matchingTile: Phaser.Tilemaps.Tile) {
-        let bMeetingPoint = false;
-        let polygon: Phaser.Tilemaps.Tile[] = [];
-        for (let tile of this.path.getArray()) {
-            if (tile == matchingTile) {
-                bMeetingPoint = true;
-            }
-            if (bMeetingPoint) {
-                polygon.push(tile);
-            }
-        }
-        return polygon;
+        var number = this.path.getArray().indexOf(matchingTile);
+        return this.path.getArray().slice(number);
     }
 
     private computePointsForGeneratedCluster() {
@@ -114,10 +85,9 @@ export class TrackingScene extends Phaser.Scene {
             for (let y = this.coordsOfRectangle.lowestY; y < this.coordsOfRectangle.highestY + 1; y++) {
                 if (this.isPointInsidePolygon(x, y)) {
                     var tileAtPosition = this.map.getTileAt(x, y);
-                    if (tileAtPosition) {
+                    if (tileAtPosition && tileAtPosition.tint != 0) {
                         this.currentPolygonContent.push(tileAtPosition);
                         tiles.push(constUtils.resolvePoint(x, y, this.map.width));
-                        console.log(tileAtPosition.index);
                         // @ts-ignore
                         points += tileAtPosition.index;
                         counter++;
@@ -126,13 +96,15 @@ export class TrackingScene extends Phaser.Scene {
             }
         }
         let average = points / counter;
+        if (isNaN(average)) return;
+
         var cluster = this.registry.get(REGISTRY.CLUSTER);
         for (let tile of tiles) {
             cluster[tile] = average;
         }
         this.registry.set(REGISTRY.CLUSTER, cluster);
 
-        this.updateScore(average);
+        this.updateScore(average,);
     }
 
     private updateScore(average: number) {
@@ -201,30 +173,22 @@ export class TrackingScene extends Phaser.Scene {
         for (let tile of this.currentPolygonContent) {
             tile.tint = 0;
         }
-        for (let tile of this.path.getArray()) {
-            tile.tint = 0;
-        }
     }
 
-    private cleanUp() {
+    private cleanUp(tile: Phaser.Tilemaps.Tile) {
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
-        this.path = new Set(); // TODO don't reset path, remove only that part that is in the circle.
+        this.updateCoordsOfRectangle(tile);
         this.currentPolygonContent = [];
-        for (let pathLight of this.pathLights) {
-            pathLight.destroy(true);
-        }
-        this.pathLights = [];
     }
 
     private extendPath(tile: Phaser.Tilemaps.Tile) {
         this.lastTile = tile;
         this.path.set(tile);
+        this.pathLength++;
 
-        tile.tint = 0.9;
+        tile.tint = 0;
 
         this.updateCoordsOfRectangle(tile);
         this.isOnRecentlyCleanedPath = false;
     }
-
-
 }
