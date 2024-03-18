@@ -87,8 +87,8 @@ export class Button extends Phaser.GameObjects.Container {
 
             this.scene.scene.start(key, data);
 
-            if (!this.scene.scene.isActive(SCENES.MENUBACKGROUND)) {
-                this.scene.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
+            if (key == SCENES.PLAY) {
+                this.scene.scene.stop(SCENES.MENUBACKGROUND);
             }
 
             //if you are leaving a Highscore scene - stop it.

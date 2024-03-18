@@ -44,7 +44,6 @@ export class GameOverScene extends Phaser.Scene {
             "Achievement Unlocked: \n\nGalactic Pancake. Try not to flatten your ship next time.",
             "You've boldly gone where many have gone before...\n\nthe game-over screen.",
             "Pro Tip:\n\nSpacecraft are not designed for head-on introductions to obstacles.",
-            "Remember, space is vast, but it's not always empty.\n\nWatch out for that... Oh, too late.",
             "It's not a bug, it's a feature:\n\nInstant spaceship recycling!"
         ];
         var randomInt = constUtils.getRandomInt(texts.length);

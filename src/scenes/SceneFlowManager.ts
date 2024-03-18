@@ -4,6 +4,7 @@ import {FLOW} from "../constants/flow.ts";
 import {LOCALSTORAGE} from "../constants/localstorage.ts";
 import {constUtils} from "../utils/constUtils.ts";
 import {REGISTRY} from "../constants/registry.ts";
+import {CONFIG} from "../constants/config.ts";
 
 export class SceneFlowManager extends Phaser.Scene {
 
@@ -109,7 +110,7 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60}
+                data: {levelId: levelData.levelId, gameTime: CONFIG.ROUNDTIME}
             },
             {
                 key: SCENES.GAMEOVER,
@@ -173,7 +174,7 @@ export class SceneFlowManager extends Phaser.Scene {
         return [
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: 60, publishToggle: true}
+                data: {levelId: levelData.levelId, gameTime: CONFIG.ROUNDTIME, publishToggle: true}
             },
             {
                 key: SCENES.GAMEOVER,

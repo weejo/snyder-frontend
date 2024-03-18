@@ -1,4 +1,4 @@
 export const CONFIG = {
-    "ROUNDTIME": 60000,
+    "ROUNDTIME": 45,
     "SCORESCALE": 1000,
 }

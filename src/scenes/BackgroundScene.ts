@@ -49,7 +49,6 @@ export class MenuBackgroundScene extends Phaser.Scene {
                 this.stars.create(x, y);
             }
         }
-
     }
 
     update (time: number, delta: number)

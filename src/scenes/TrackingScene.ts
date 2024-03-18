@@ -8,7 +8,7 @@ import Set = Phaser.Structs.Set;
 
 export class TrackingScene extends Phaser.Scene {
     player: any;
-    lastTile?: Phaser.Tilemaps.Tile;
+    lastTiles: Set<Phaser.Tilemaps.Tile>;
     path: Set<Phaser.Tilemaps.Tile>;
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
@@ -17,7 +17,7 @@ export class TrackingScene extends Phaser.Scene {
     currentPolygon: Phaser.Tilemaps.Tile[];
     currentPolygonContent: Phaser.Tilemaps.Tile[];
     blackDeathToggle: boolean;
-    isOnRecentlyCleanedPath: boolean;
+
     hasVisitedNewTiles: boolean;
     pathLength: number;
 
@@ -26,13 +26,12 @@ export class TrackingScene extends Phaser.Scene {
             key: SCENES.TRACKING, active: true
         });
         this.path = new Set();
-        this.lastTile = undefined;
+        this.lastTiles = new Set();
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
         this.currentPolygon = [];
         this.currentPolygonContent = [];
         this.blackDeathToggle = true;
-        this.isOnRecentlyCleanedPath = false;
         this.hasVisitedNewTiles = false;
         this.pathLength = 0;
     }
@@ -51,16 +50,18 @@ export class TrackingScene extends Phaser.Scene {
     update(time: number, delta: number) {
         if (this.bIsGameRunning) {
             var tile = this.map.getTileAtWorldXY(this.player.x, this.player.y);
-            if (tile && this.lastTile != tile) {
+
+            if (tile && !this.lastTiles.contains(tile)) {
                 if (this.hasVisitedNewTiles && this.path.contains(tile)) {
                     this.currentPolygon = this.extractPolygon(tile);
                     this.computePointsForGeneratedCluster();
                     this.updateVisitedTiles();
                     this.cleanUp(tile);
-                    this.isOnRecentlyCleanedPath = true;
                     this.hasVisitedNewTiles = false;
                 } else {
-                    this.hasVisitedNewTiles = true;
+                    if (tile.tint != 0) {
+                        this.hasVisitedNewTiles = true;
+                    }
                     this.extendPath(tile);
                 }
             }
@@ -95,6 +96,10 @@ export class TrackingScene extends Phaser.Scene {
                 }
             }
         }
+        this.computePoints(points, counter, tiles);
+    }
+
+    private computePoints(points: number, counter: number, tiles: any[]) {
         let average = points / counter;
         if (isNaN(average)) return;
 
@@ -104,7 +109,7 @@ export class TrackingScene extends Phaser.Scene {
         }
         this.registry.set(REGISTRY.CLUSTER, cluster);
 
-        this.updateScore(average,);
+        this.updateScore(average);
     }
 
     private updateScore(average: number) {
@@ -176,19 +181,25 @@ export class TrackingScene extends Phaser.Scene {
     }
 
     private cleanUp(tile: Phaser.Tilemaps.Tile) {
-        this.coordsOfRectangle = this.resetCoordsOfRectangle();
-        this.updateCoordsOfRectangle(tile);
+        //this.coordsOfRectangle = this.resetCoordsOfRectangle();
+        //this.updateCoordsOfRectangle(tile);
         this.currentPolygonContent = [];
     }
 
     private extendPath(tile: Phaser.Tilemaps.Tile) {
-        this.lastTile = tile;
         this.path.set(tile);
+        this.lastTiles.clear();
+        this.lastTiles.set(tile);
+        var additionalTile = this.map.getTileAt(tile.x, tile.y + 1);
+        if (additionalTile != null) {
+            this.lastTiles.set(additionalTile);
+            this.path.set(additionalTile);
+            additionalTile.tint = 0;
+        }
         this.pathLength++;
 
         tile.tint = 0;
 
         this.updateCoordsOfRectangle(tile);
-        this.isOnRecentlyCleanedPath = false;
     }
 }
