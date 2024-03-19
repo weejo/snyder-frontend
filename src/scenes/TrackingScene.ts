@@ -181,25 +181,34 @@ export class TrackingScene extends Phaser.Scene {
     }
 
     private cleanUp(tile: Phaser.Tilemaps.Tile) {
-        //this.coordsOfRectangle = this.resetCoordsOfRectangle();
-        //this.updateCoordsOfRectangle(tile);
+        this.coordsOfRectangle = this.resetCoordsOfRectangle();
+        this.updateCoordsOfRectangle(tile);
         this.currentPolygonContent = [];
     }
 
     private extendPath(tile: Phaser.Tilemaps.Tile) {
         this.path.set(tile);
         this.lastTiles.clear();
-        this.lastTiles.set(tile);
-        var additionalTile = this.map.getTileAt(tile.x, tile.y + 1);
-        if (additionalTile != null) {
-            this.lastTiles.set(additionalTile);
-            this.path.set(additionalTile);
-            additionalTile.tint = 0;
-        }
+        this.addAdditionalTiles(tile);
         this.pathLength++;
 
         tile.tint = 0;
 
         this.updateCoordsOfRectangle(tile);
+    }
+
+    private addAdditionalTiles(tile: Phaser.Tilemaps.Tile) {
+        this.lastTiles.set(tile);
+        for (let y = -2; y <2; y++) {
+            for (let x = -2; x < 2; x++) {
+                var additionalTile = this.map.getTileAt(tile.x +x, tile.y + y);
+                if (additionalTile != null) {
+                    this.lastTiles.set(additionalTile);
+                    this.path.set(additionalTile);
+                    additionalTile.tint = 0;
+                }
+            }
+        }
+
     }
 }

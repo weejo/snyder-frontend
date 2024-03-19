@@ -18,8 +18,6 @@ new Phaser.Game({
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        height: 1080,
-        width: 1920
     },
     scene: [
         LoadScene,
@@ -39,12 +37,12 @@ new Phaser.Game({
     ],
     render: {
         // so it doesn't default sharpen images. I hope.
-        pixelArt: true
+        //pixelArt: true
     },
     physics: {
         default: "arcade",
         arcade: {
-            fixedStep: false,
+            fixedStep: true,
             debug: true,
             debugShowBody: true,
             debugShowStaticBody: true,

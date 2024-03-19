@@ -18,7 +18,7 @@ export class LevelSelectMenuScene extends Phaser.Scene {
     }
 
     create() {
-        new TextField(this, 2, "Level Select", 3);
+        new TextField(this, 2, "Level Select", 2);
 
         var levelOverviewData = this.registry.get(REGISTRY.OVERVIEW);
 

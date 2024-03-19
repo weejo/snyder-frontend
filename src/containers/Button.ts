@@ -17,7 +17,7 @@ export class Button extends Phaser.GameObjects.Container {
     scale: number;
     flow: string;
 
-    constructor(scene: Phaser.Scene, lineNumber: number, content: string, flow: string = FLOW.NOFLOW, scale: number = 2) {
+    constructor(scene: Phaser.Scene, lineNumber: number, content: string, flow: string = FLOW.NOFLOW, scale: number = 1) {
         super(scene, undefined);
         let {width, height} = this.scene.sys.game.canvas;
 
@@ -39,11 +39,11 @@ export class Button extends Phaser.GameObjects.Container {
     }
 
     create() {
-        var spaceshipLeft = this.scene.add.image(50, 50, IMAGE.SHIP);
-        var spaceshipRight = this.scene.add.image(50, 50, IMAGE.SHIP);
-        spaceshipLeft.setScale(0.4);
+        var spaceshipLeft = this.scene.add.image(25, 25, IMAGE.SHIP);
+        var spaceshipRight = this.scene.add.image(25, 25, IMAGE.SHIP);
+        spaceshipLeft.setScale(0.3);
         spaceshipLeft.setAngle(-90);
-        spaceshipRight.setScale(0.4);
+        spaceshipRight.setScale(0.3);
         spaceshipRight.setAngle(-90);
         spaceshipLeft.setVisible(false);
         spaceshipRight.setVisible(false);

@@ -19,7 +19,7 @@ export class HighscoreSelectMenuScene extends Phaser.Scene {
     }
 
     create() {
-        new TextField(this, 2, "HighScore Select", 3);
+        new TextField(this, 2, "Highscore Select", 2);
 
         var levelOverviewData = this.registry.get(REGISTRY.OVERVIEW);
 

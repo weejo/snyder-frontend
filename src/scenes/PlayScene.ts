@@ -64,8 +64,8 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        //this.load.tilemapTiledJSON('tilemap', URLS.LEVELDATA + this.levelId);
-        this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
+        this.load.tilemapTiledJSON('tilemap', URLS.LEVELDATA + this.levelId);
+        //this.load.tilemapTiledJSON('tilemap', 'assets/hurz.json')
     }
 
     create() {
@@ -127,7 +127,7 @@ export class PlayScene extends Phaser.Scene {
         } else {
             this.player.setDrag(300);
             this.player.setAngularDrag(400);
-            this.player.setMaxVelocity(600);
+            this.player.setMaxVelocity(400);
         }
 
         this.physics.world.setBounds(0, 0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);

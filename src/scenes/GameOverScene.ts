@@ -23,9 +23,9 @@ export class GameOverScene extends Phaser.Scene {
             this.scene.launch(SCENES.MENUBACKGROUND); // Making fancy background FX
         }
 
-        new TextField(this, 2, "Game Over", 3);
+        new TextField(this, 2, "Game Over", 2);
 
-        new TextField(this, 4, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 3);
+        new TextField(this, 4, "Points: " + this.registry.get(REGISTRY.SCORE).toString(), 2);
 
         new TextField(this, 6, this.generateGameOverMessage());
 

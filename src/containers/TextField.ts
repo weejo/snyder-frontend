@@ -9,7 +9,7 @@ export class TextField extends Phaser.GameObjects.Container {
     scale: number;
 
 
-    constructor(scene: Phaser.Scene, lineNumber: number, content: string, scale: number = 2) {
+    constructor(scene: Phaser.Scene, lineNumber: number, content: string, scale: number = 1) {
         super(scene, undefined);
         let {width, height} = this.scene.sys.game.canvas;
 

@@ -26,7 +26,7 @@ export class HighscoreScene extends Phaser.Scene {
     }
 
     create() {
-        new TextField(this, 2, this.levelData.name + " Highscore", 3);
+        new TextField(this, 2, this.levelData.name + " Highscore", 2);
 
         new TextField(this, 3, "RANK | SCORE | NAME", 2);
 
