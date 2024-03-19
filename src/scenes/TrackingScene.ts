@@ -10,12 +10,12 @@ export class TrackingScene extends Phaser.Scene {
     player: any;
     lastTiles: Set<Phaser.Tilemaps.Tile>;
     path: Set<Phaser.Tilemaps.Tile>;
+    tilesInsidePolygon: number[];
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
     coordsOfRectangle: any;
     bIsGameRunning: boolean;
     currentPolygon: Phaser.Tilemaps.Tile[];
-    currentPolygonContent: Phaser.Tilemaps.Tile[];
     blackDeathToggle: boolean;
 
     hasVisitedNewTiles: boolean;
@@ -30,10 +30,10 @@ export class TrackingScene extends Phaser.Scene {
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
         this.currentPolygon = [];
-        this.currentPolygonContent = [];
         this.blackDeathToggle = true;
         this.hasVisitedNewTiles = false;
         this.pathLength = 0;
+        this.tilesInsidePolygon = [];
     }
 
     init(data: any) {
@@ -55,7 +55,6 @@ export class TrackingScene extends Phaser.Scene {
                 if (this.hasVisitedNewTiles && this.path.contains(tile)) {
                     this.currentPolygon = this.extractPolygon(tile);
                     this.computePointsForGeneratedCluster();
-                    this.updateVisitedTiles();
                     this.cleanUp(tile);
                     this.hasVisitedNewTiles = false;
                 } else {
@@ -81,14 +80,14 @@ export class TrackingScene extends Phaser.Scene {
     private computePointsForGeneratedCluster() {
         let points = 0;
         let counter = 0;
-        let tiles = [];
+
         for (let x = this.coordsOfRectangle.lowestX; x < this.coordsOfRectangle.highestX + 1; x++) {
             for (let y = this.coordsOfRectangle.lowestY; y < this.coordsOfRectangle.highestY + 1; y++) {
                 if (this.isPointInsidePolygon(x, y)) {
                     var tileAtPosition = this.map.getTileAt(x, y);
                     if (tileAtPosition && tileAtPosition.tint != 0) {
-                        this.currentPolygonContent.push(tileAtPosition);
-                        tiles.push(constUtils.resolvePoint(x, y, this.map.width));
+                        tileAtPosition.tint = 0;
+                        this.tilesInsidePolygon.push(constUtils.resolvePoint(x, y, this.map.width));
                         // @ts-ignore
                         points += tileAtPosition.index;
                         counter++;
@@ -96,15 +95,14 @@ export class TrackingScene extends Phaser.Scene {
                 }
             }
         }
-        this.computePoints(points, counter, tiles);
+        this.computePoints(points / counter);
     }
 
-    private computePoints(points: number, counter: number, tiles: any[]) {
-        let average = points / counter;
+    private computePoints(average: number) {
         if (isNaN(average)) return;
 
         var cluster = this.registry.get(REGISTRY.CLUSTER);
-        for (let tile of tiles) {
+        for (let tile of this.tilesInsidePolygon) {
             cluster[tile] = average;
         }
         this.registry.set(REGISTRY.CLUSTER, cluster);
@@ -174,16 +172,10 @@ export class TrackingScene extends Phaser.Scene {
         this.bIsGameRunning = bIsRunning;
     }
 
-    private updateVisitedTiles() {
-        for (let tile of this.currentPolygonContent) {
-            tile.tint = 0;
-        }
-    }
-
     private cleanUp(tile: Phaser.Tilemaps.Tile) {
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.updateCoordsOfRectangle(tile);
-        this.currentPolygonContent = [];
+        this.tilesInsidePolygon.length = 0;
     }
 
     private extendPath(tile: Phaser.Tilemaps.Tile) {
@@ -199,9 +191,9 @@ export class TrackingScene extends Phaser.Scene {
 
     private addAdditionalTiles(tile: Phaser.Tilemaps.Tile) {
         this.lastTiles.set(tile);
-        for (let y = -2; y <2; y++) {
+        for (let y = -2; y < 2; y++) {
             for (let x = -2; x < 2; x++) {
-                var additionalTile = this.map.getTileAt(tile.x +x, tile.y + y);
+                var additionalTile = this.map.getTileAt(tile.x + x, tile.y + y);
                 if (additionalTile != null) {
                     this.lastTiles.set(additionalTile);
                     this.path.set(additionalTile);
