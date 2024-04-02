@@ -8,7 +8,8 @@ import Set = Phaser.Structs.Set;
 
 export class TrackingScene extends Phaser.Scene {
     player: any;
-    lastTiles: Set<Phaser.Tilemaps.Tile>;
+    lastTile: Phaser.Tilemaps.Tile;
+    lastPosition: {x: number, y: number};
     path: Set<Phaser.Tilemaps.Tile>;
     tilesInsidePolygon: number[];
     // @ts-ignore
@@ -21,12 +22,14 @@ export class TrackingScene extends Phaser.Scene {
     hasVisitedNewTiles: boolean;
     pathLength: number;
 
+    counterella: number;
+    pointerella: number;
+
     constructor() {
         super({
-            key: SCENES.TRACKING, active: true
+            key: SCENES.TRACKING, active: false
         });
         this.path = new Set();
-        this.lastTiles = new Set();
         this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.bIsGameRunning = false;
         this.currentPolygon = [];
@@ -34,10 +37,13 @@ export class TrackingScene extends Phaser.Scene {
         this.hasVisitedNewTiles = false;
         this.pathLength = 0;
         this.tilesInsidePolygon = [];
+        this.pointerella = 0;
+        this.counterella = 0;
     }
 
     init(data: any) {
         this.player = data.player;
+        this.lastPosition = {x: data.player.x, y: data.player.y};
         this.map = data.map;
         this.blackDeathToggle = data.blackDeathToggle;
     }
@@ -51,7 +57,7 @@ export class TrackingScene extends Phaser.Scene {
         if (this.bIsGameRunning) {
             var tile = this.map.getTileAtWorldXY(this.player.x, this.player.y);
 
-            if (tile && !this.lastTiles.contains(tile)) {
+            if (tile && this.lastTile != tile) {
                 if (this.hasVisitedNewTiles && this.path.contains(tile)) {
                     this.currentPolygon = this.extractPolygon(tile);
                     this.computePointsForGeneratedCluster();
@@ -61,7 +67,7 @@ export class TrackingScene extends Phaser.Scene {
                     if (tile.tint != 0) {
                         this.hasVisitedNewTiles = true;
                     }
-                    this.extendPath(tile);
+                    this.extendPath(tile, this.player.x, this.player.y);
                 }
             }
         }
@@ -173,34 +179,29 @@ export class TrackingScene extends Phaser.Scene {
     }
 
     private cleanUp(tile: Phaser.Tilemaps.Tile) {
-        this.coordsOfRectangle = this.resetCoordsOfRectangle();
         this.updateCoordsOfRectangle(tile);
         this.tilesInsidePolygon.length = 0;
     }
 
-    private extendPath(tile: Phaser.Tilemaps.Tile) {
+    private extendPath(tile: Phaser.Tilemaps.Tile, x:number, y:number) {
         this.path.set(tile);
-        this.lastTiles.clear();
-        this.addAdditionalTiles(tile);
-        this.pathLength++;
+        var result= this.map.getTilesWithinShape(new Phaser.Geom.Line(x, y, this.lastPosition.x, this.lastPosition.y));
 
-        tile.tint = 0;
-
-        this.updateCoordsOfRectangle(tile);
-    }
-
-    private addAdditionalTiles(tile: Phaser.Tilemaps.Tile) {
-        this.lastTiles.set(tile);
-        for (let y = -2; y < 2; y++) {
-            for (let x = -2; x < 2; x++) {
-                var additionalTile = this.map.getTileAt(tile.x + x, tile.y + y);
-                if (additionalTile != null) {
-                    this.lastTiles.set(additionalTile);
-                    this.path.set(additionalTile);
-                    additionalTile.tint = 0;
+        this.lastPosition = {x: x, y: y};
+        if (result !=  null && result.length > 0) {
+            this.pathLength += result.length;
+            for (let eachTile of result) {
+                if (eachTile) {
+                    eachTile.tint = 0;
+                    this.path.set(eachTile);
                 }
+
             }
         }
 
+        this.lastTile = tile;
+        tile.tint = 0;
+
+        this.updateCoordsOfRectangle(tile);
     }
 }
