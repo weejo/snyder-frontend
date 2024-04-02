@@ -1,9 +1,9 @@
 First the controls:
 
-Forward: W / Arrow-Up
+Forward: Arrow-Up
 
-Left: A / Arrow-Left
+Left: Arrow-Left
 
-Right: D / Arrow-Right
+Right: Arrow-Right
 
 Booster: Spacebar

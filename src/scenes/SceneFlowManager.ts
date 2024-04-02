@@ -110,7 +110,7 @@ export class SceneFlowManager extends Phaser.Scene {
             },
             {
                 key: SCENES.PLAY,
-                data: {levelId: levelData.levelId, gameTime: CONFIG.ROUNDTIME}
+                data: {levelId: levelData.levelId, gameTime: CONFIG.ROUNDTIME, publishToggle: true}
             },
             {
                 key: SCENES.GAMEOVER,

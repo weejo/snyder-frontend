@@ -1,14 +1,14 @@
 Your goal is to fly around and get points.
 
-You get points for creating a circle.
+You get points for creating a circle on the color field.
 
-You get the average of the included points.
+You get the average of the included color values.
 
 Move your mouse to see the value of colors.
 
 
 TL;DR:
 
-1) Fly around red space - win game.
+1) Fly circles around the red fields - win game.
 
 2) Black fields kill.

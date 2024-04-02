@@ -1,1 +1,2 @@
-First, we need your name - max 5 chars:
+First, we need your name:
+(max 5 chars)
