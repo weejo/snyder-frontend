@@ -11,7 +11,6 @@ export class TrackingScene extends Phaser.Scene {
     lastTile: Phaser.Tilemaps.Tile;
     lastPosition: {x: number, y: number};
     path: Set<Phaser.Tilemaps.Tile>;
-    tilesInsidePolygon: number[];
     // @ts-ignore
     map: Phaser.Tilemaps.Tilemap;
     coordsOfRectangle: any;
@@ -36,7 +35,6 @@ export class TrackingScene extends Phaser.Scene {
         this.blackDeathToggle = true;
         this.hasVisitedNewTiles = false;
         this.pathLength = 0;
-        this.tilesInsidePolygon = [];
         this.pointerella = 0;
         this.counterella = 0;
     }
@@ -86,6 +84,7 @@ export class TrackingScene extends Phaser.Scene {
     private computePointsForGeneratedCluster() {
         let points = 0;
         let counter = 0;
+        let tilesInsidePolygon = [];
 
         for (let x = this.coordsOfRectangle.lowestX; x < this.coordsOfRectangle.highestX + 1; x++) {
             for (let y = this.coordsOfRectangle.lowestY; y < this.coordsOfRectangle.highestY + 1; y++) {
@@ -93,7 +92,7 @@ export class TrackingScene extends Phaser.Scene {
                     var tileAtPosition = this.map.getTileAt(x, y);
                     if (tileAtPosition && tileAtPosition.tint != 0) {
                         tileAtPosition.tint = 0;
-                        this.tilesInsidePolygon.push(constUtils.resolvePoint(x, y, this.map.width));
+                        tilesInsidePolygon.push(constUtils.resolvePoint(x, y, this.map.width));
                         // @ts-ignore
                         points += tileAtPosition.index;
                         counter++;
@@ -101,16 +100,19 @@ export class TrackingScene extends Phaser.Scene {
                 }
             }
         }
-        this.computePoints(points / counter);
+        this.computePoints(points / counter, tilesInsidePolygon);
     }
 
-    private computePoints(average: number) {
+    private computePoints(average: number, tilesInsidePolygon: any[]) {
         if (isNaN(average)) return;
 
         var cluster = this.registry.get(REGISTRY.CLUSTER);
-        for (let tile of this.tilesInsidePolygon) {
-            cluster[tile] = average;
-        }
+        var clusterpoints = this.registry.get(REGISTRY.CLUSTERPOINTS);
+
+        cluster.push(tilesInsidePolygon);
+        clusterpoints.push(average);
+
+        this.registry.set(REGISTRY.CLUSTERPOINTS, clusterpoints);
         this.registry.set(REGISTRY.CLUSTER, cluster);
 
         this.updateScore(average);
@@ -150,11 +152,6 @@ export class TrackingScene extends Phaser.Scene {
         }
     }
 
-    /**
-     * wtf?
-     * @param tile
-     * @private
-     */
     private updateCoordsOfRectangle(tile: Phaser.Tilemaps.Tile) {
         if (tile.x > this.coordsOfRectangle.highestX) {
             this.coordsOfRectangle.highestX = tile.x;
@@ -180,7 +177,6 @@ export class TrackingScene extends Phaser.Scene {
 
     private cleanUp(tile: Phaser.Tilemaps.Tile) {
         this.updateCoordsOfRectangle(tile);
-        this.tilesInsidePolygon.length = 0;
     }
 
     private extendPath(tile: Phaser.Tilemaps.Tile, x:number, y:number) {

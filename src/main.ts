@@ -43,13 +43,13 @@ new Phaser.Game({
         default: "arcade",
         arcade: {
             fixedStep: true,
-            debug: true,
+            /*debug: true,
             debugShowBody: true,
             debugShowStaticBody: true,
             debugShowVelocity: true,
             debugVelocityColor: 0xffff00,
             debugBodyColor: 0x0000ff,
-            debugStaticBodyColor: 0xffffff
+            debugStaticBodyColor: 0xffffff */
         }
     },
     dom: {

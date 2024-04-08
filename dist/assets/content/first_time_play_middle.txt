@@ -7,8 +7,4 @@ You get the average of the included color values.
 Move your mouse to see the value of colors.
 
 
-TL;DR:
-
-1) Fly circles around the red fields - win game.
-
-2) Black fields kill.
+TL;DR: Fly circles around the red fields - win game.

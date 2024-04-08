@@ -22,7 +22,6 @@ export class PlayScene extends Phaser.Scene {
     gameTime: number;
     inputData: {countUp: number, timeUp: number, timeLeft: number, countLeft: number, timeRight: number, countRight: number, timeSpace: number, countSpace: number};
     inputToggles: {up: boolean, left: boolean, right: boolean, space: boolean}
-
     publishToggle: boolean;
     blackDeathToggle: boolean;
     asteroidsToggle: boolean;
@@ -85,10 +84,8 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private initializeRegistry() {
-        var array = new Array(this.map.width * this.map.height);
-        array.fill(0);
-
-        this.registry.set(REGISTRY.CLUSTER, array);
+        this.registry.set(REGISTRY.CLUSTER, []);
+        this.registry.set(REGISTRY.CLUSTERPOINTS, []);
         this.registry.set(REGISTRY.SCORE, 0);
     }
 
@@ -114,7 +111,7 @@ export class PlayScene extends Phaser.Scene {
 
         });
 
-        this.player = this.physics.add.image(400, 400, IMAGE.SHIP);
+        this.player = this.physics.add.image((this.map.width * this.tileset.tileWidth /2), (this.map.height * this.tileset.tileHeight/2), IMAGE.SHIP);
 
         this.emitter.startFollow(this.player);
 
@@ -133,7 +130,7 @@ export class PlayScene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, this.map.width * this.tileset.tileWidth, this.map.height * this.tileset.tileHeight);
 
         this.cameras.main.startFollow(this.player);
-        this.cameras.main.setZoom(0.5, 0.5);
+        this.cameras.main.setZoom(0.35, 0.35);
     }
 
     private prepareMap() {
@@ -252,11 +249,21 @@ export class PlayScene extends Phaser.Scene {
             points: parseInt(this.registry.get(REGISTRY.SCORE)),
             name: localStorage.getItem(LOCALSTORAGE.USERNAME)
         }
+
+        var cluster = this.registry.get(REGISTRY.CLUSTER);
+        var clusterpoints = this.registry.get(REGISTRY.CLUSTERPOINTS);
+        var clusters = [];
+        for (let i = 0; i < cluster.length; i++) {
+            cluster[i]
+            clusters.push({points: cluster[i], score: clusterpoints[i]});
+        }
+
         var playerData = {
             pathLength: (this.scene.get(SCENES.TRACKING) as TrackingScene).pathLength,
-            clusterData: this.registry.get(REGISTRY.CLUSTER),
+            clusterData: clusters,
             inputData: this.inputData
         }
+
 
         fetch(URLS.ADDRESULT, {
             method: 'POST',
